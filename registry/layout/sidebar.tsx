@@ -32,14 +32,27 @@ export interface SidebarProps {
   dbConfigured?: boolean;
   /** Slot for ProjectSwitcher or similar — rendered between logo and nav */
   topSlot?: React.ReactNode;
-  /** Slot for footer actions — theme/lang toggles, etc. Rendered above logout. */
+  /** Slot for footer actions (theme/lang toggles, etc.). Rendered above userCardSlot. */
   footerSlot?: React.ReactNode;
-  /** Logout handler — if omitted, logout button hidden */
+  /** Slot for user info card (avatar + name + logout) at the very bottom. */
+  userCardSlot?: React.ReactNode;
+  /** Logout handler — if omitted, logout button hidden. (Ignored if userCardSlot provided.) */
   onLogout?: () => void;
   /** Logout label (i18n consumer-provided) */
   logoutLabel?: string;
 }
 
+/**
+ * Sidebar primitive. Visual reference: AIA Website production sidebar (v2026-05).
+ *
+ * Layout (top → bottom):
+ *   logo block (border-b)
+ *   topSlot (e.g. ProjectSwitcher)
+ *   collapse + topActions inline row
+ *   nav sections (with border-t dividers between sections, not before first)
+ *   footerSlot
+ *   userCardSlot (or simple logout button as fallback)
+ */
 export function Sidebar({
   logo,
   sections,
@@ -47,6 +60,7 @@ export function Sidebar({
   dbConfigured = true,
   topSlot,
   footerSlot,
+  userCardSlot,
   onLogout,
   logoutLabel = "Log out",
 }: SidebarProps) {
@@ -73,11 +87,11 @@ export function Sidebar({
               ? "bg-[var(--primary)] text-[var(--primary-fg)]"
               : isLocked
                 ? "text-[var(--fg-muted)]/50 hover:text-[var(--fg-muted)] hover:bg-[var(--bg-subtle)]"
-                : "text-[var(--fg-secondary)] hover:bg-[var(--bg-subtle)]",
+                : "text-[var(--fg-secondary)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)]",
         )}
       >
-        <Icon className="h-4 w-4 shrink-0" />
-        {!collapsed && <span>{item.label}</span>}
+        <Icon className="h-[18px] w-[18px] shrink-0" />
+        {!collapsed && <span className="truncate">{item.label}</span>}
       </Link>
     );
   };
@@ -85,17 +99,53 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "flex flex-col gap-3 border-r border-[var(--border)] bg-[var(--bg-card)] py-4 px-3 transition-all",
-        collapsed ? "w-[64px]" : "w-[260px]",
+        "bg-[var(--bg-card)] border-r border-[var(--border-subtle)] h-screen flex flex-col transition-all duration-300 ease-in-out shrink-0",
+        collapsed ? "w-[68px]" : "w-56",
       )}
     >
-      {logo && <div className="flex items-center justify-center mb-2">{logo}</div>}
-      {topSlot && <div>{topSlot}</div>}
-      <nav className="flex flex-col gap-4 flex-1 overflow-y-auto">
+      {logo && (
+        <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-center overflow-hidden">
+          {logo}
+        </div>
+      )}
+
+      {topSlot && <div className="border-b border-[var(--border-subtle)]">{topSlot}</div>}
+
+      {/* Collapse button row (top-positioned, matches AIA pattern) */}
+      <div className="px-3 pt-3 pb-1">
+        <button
+          type="button"
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className={cn(
+            "flex items-center gap-2 text-[var(--fg-muted)] hover:text-[var(--fg)] hover:bg-[var(--bg-subtle)] transition-all rounded-lg px-2.5 py-2 text-xs",
+            collapsed ? "w-full justify-center" : "w-full",
+          )}
+        >
+          {collapsed ? (
+            <PanelLeftOpen className="h-4 w-4" />
+          ) : (
+            <>
+              <PanelLeftClose className="h-4 w-4 shrink-0" />
+              <span>Collapse</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="mx-4 border-t border-[var(--border-subtle)]" />
+
+      <nav className="flex-1 px-3 pt-2 pb-3 overflow-y-auto overflow-x-hidden">
         {sections.map((sec, i) => (
-          <div key={i} className="flex flex-col gap-1">
+          <div
+            key={i}
+            className={cn(
+              "flex flex-col gap-0.5",
+              i > 0 && "pt-3 mt-3 border-t border-[var(--border-subtle)]",
+            )}
+          >
             {!collapsed && sec.title && (
-              <h3 className="text-[10px] uppercase tracking-wide text-[var(--fg-muted)] px-3">
+              <h3 className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--fg-muted)]">
                 {sec.title}
               </h3>
             )}
@@ -103,27 +153,27 @@ export function Sidebar({
           </div>
         ))}
       </nav>
-      <div className="flex flex-col gap-2 border-t border-[var(--border-subtle)] pt-3">
-        {footerSlot}
-        {onLogout && (
-          <button
-            type="button"
-            onClick={onLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-[var(--fg-secondary)] hover:bg-[var(--bg-subtle)]"
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {!collapsed && <span>{logoutLabel}</span>}
-          </button>
-        )}
-        <button
-          type="button"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-center p-2 rounded-md text-[var(--fg-muted)] hover:bg-[var(--bg-subtle)]"
-        >
-          {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-        </button>
-      </div>
+
+      {(footerSlot || userCardSlot || onLogout) && (
+        <div className="p-3 border-t border-[var(--border-subtle)] flex flex-col gap-1">
+          {footerSlot}
+          {userCardSlot ?? (
+            onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-[var(--fg-secondary)] hover:bg-[var(--bg-subtle)] transition-colors",
+                  collapsed && "justify-center px-0",
+                )}
+              >
+                <LogOut className="h-[18px] w-[18px] shrink-0" />
+                {!collapsed && <span>{logoutLabel}</span>}
+              </button>
+            )
+          )}
+        </div>
+      )}
     </aside>
   );
 }

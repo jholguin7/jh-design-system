@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-scroll-reveal",
+  "type": "registry:hook",
+  "title": "useScrollReveal hook",
+  "description": "Reveal element when it intersects viewport",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-scroll-reveal.ts",
+      "content": "\"use client\";\nimport { useEffect, useRef, useState } from \"react\";\n\n/**\n * Reveal an element when it scrolls into view. Returns a ref + boolean.\n *\n * @param threshold IntersectionObserver threshold (0..1). Default: 0.15.\n */\nexport function useScrollReveal<T extends HTMLElement = HTMLElement>(\n  threshold = 0.15,\n): { ref: React.RefObject<T | null>; revealed: boolean } {\n  const ref = useRef<T | null>(null);\n  const [revealed, setRevealed] = useState(false);\n\n  useEffect(() => {\n    if (typeof window === \"undefined\") return;\n    const el = ref.current;\n    if (!el) return;\n    const obs = new IntersectionObserver(\n      (entries) => {\n        for (const e of entries) {\n          if (e.isIntersecting) {\n            setRevealed(true);\n            obs.disconnect();\n            return;\n          }\n        }\n      },\n      { threshold },\n    );\n    obs.observe(el);\n    return () => obs.disconnect();\n  }, [threshold]);\n\n  return { ref, revealed };\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-scroll-reveal.ts"
+    }
+  ]
+}

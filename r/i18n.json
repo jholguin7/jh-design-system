@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "i18n",
+  "type": "registry:lib",
+  "title": "i18n base dictionary",
+  "description": "Base translation dictionary + Lang type + mergeDicts helper",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "lib/i18n.ts",
+      "content": "export type Lang = \"es\" | \"en\";\nexport type TranslationDict = Record<string, { es: string; en: string }>;\n\nexport const baseTranslations: TranslationDict = {\n  \"common.save\": { es: \"Guardar\", en: \"Save\" },\n  \"common.cancel\": { es: \"Cancelar\", en: \"Cancel\" },\n  \"common.loading\": { es: \"Cargando…\", en: \"Loading…\" },\n  \"common.search\": { es: \"Buscar\", en: \"Search\" },\n  \"common.close\": { es: \"Cerrar\", en: \"Close\" },\n  \"nav.dashboard\": { es: \"Panel\", en: \"Dashboard\" },\n  \"nav.settings\": { es: \"Configuración\", en: \"Settings\" },\n  \"nav.admin\": { es: \"Administración\", en: \"Admin\" },\n  \"nav.logout\": { es: \"Cerrar sesión\", en: \"Log out\" },\n  \"theme.toggle\": { es: \"Cambiar tema\", en: \"Toggle theme\" },\n  \"theme.light\": { es: \"Claro\", en: \"Light\" },\n  \"theme.dark\": { es: \"Oscuro\", en: \"Dark\" },\n  \"lang.toggle\": { es: \"Cambiar idioma\", en: \"Change language\" },\n};\n\nexport function mergeDicts(...dicts: TranslationDict[]): TranslationDict {\n  return Object.assign({}, ...dicts);\n}\n",
+      "type": "registry:lib",
+      "target": "lib/i18n.ts"
+    }
+  ]
+}

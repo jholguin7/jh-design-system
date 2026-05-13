@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sunburst-chart",
+  "type": "registry:component",
+  "title": "SunburstChart",
+  "description": "Concentric pie sunburst (1-2 rings)",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/sunburst-chart.tsx",
+      "content": "\"use client\";\nimport { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from \"recharts\";\n\nexport interface SunburstNode {\n  name: string;\n  value?: number;\n  children?: SunburstNode[];\n}\n\nexport interface SunburstChartProps {\n  root: SunburstNode;\n  height?: number;\n  /** Optional fill palette for rings */\n  colors?: string[];\n  className?: string;\n}\n\nconst DEFAULT_COLORS = [\n  \"var(--primary)\",\n  \"var(--primary-hover)\",\n  \"var(--primary-light)\",\n  \"var(--primary-dark)\",\n  \"var(--signal-ok)\",\n  \"var(--signal-warn)\",\n];\n\nfunction flatten(node: SunburstNode, depth = 0): Array<{ name: string; value: number; depth: number }> {\n  if (!node.children || node.children.length === 0) {\n    return [{ name: node.name, value: node.value ?? 0, depth }];\n  }\n  return node.children.flatMap((c) => flatten(c, depth + 1));\n}\n\n/**\n * Minimal sunburst: rings drawn as concentric pies. For deep hierarchies,\n * use a dedicated sunburst lib downstream; this serves the 1-2 ring case.\n */\nexport function SunburstChart({\n  root,\n  height = 280,\n  colors = DEFAULT_COLORS,\n  className,\n}: SunburstChartProps) {\n  const leaves = flatten(root);\n  const maxDepth = Math.max(1, ...leaves.map((l) => l.depth));\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <PieChart>\n          {Array.from({ length: maxDepth }).map((_, ring) => {\n            const ringData = leaves.filter((l) => l.depth === ring + 1);\n            if (ringData.length === 0) return null;\n            const inner = 30 + ring * 35;\n            const outer = inner + 30;\n            return (\n              <Pie\n                key={ring}\n                data={ringData}\n                dataKey=\"value\"\n                cx=\"50%\"\n                cy=\"50%\"\n                innerRadius={inner}\n                outerRadius={outer}\n              >\n                {ringData.map((_, i) => (\n                  <Cell key={i} fill={colors[i % colors.length]} />\n                ))}\n              </Pie>\n            );\n          })}\n          <Tooltip />\n        </PieChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/sunburst-chart.tsx"
+    }
+  ]
+}

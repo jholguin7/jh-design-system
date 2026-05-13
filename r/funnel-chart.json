@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "funnel-chart",
+  "type": "registry:component",
+  "title": "FunnelChart",
+  "description": "Recharts funnel with generic stages prop",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/funnel-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  FunnelChart as RechartsFunnel,\n  Funnel,\n  Tooltip,\n  LabelList,\n} from \"recharts\";\n\nexport interface FunnelStage {\n  name: string;\n  value: number;\n}\n\nexport interface FunnelChartProps {\n  stages: FunnelStage[];\n  /** Optional palette override; defaults to CSS-variable-based fills via inline colors[] */\n  colors?: string[];\n  height?: number;\n  className?: string;\n}\n\nconst DEFAULT_COLORS = [\n  \"var(--primary)\",\n  \"var(--primary-hover)\",\n  \"var(--primary-dark)\",\n];\n\nexport function FunnelChart({\n  stages,\n  colors = DEFAULT_COLORS,\n  height = 240,\n  className,\n}: FunnelChartProps) {\n  const data = stages.map((s, i) => ({\n    ...s,\n    fill: colors[i % colors.length],\n  }));\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <RechartsFunnel>\n          <Tooltip />\n          <Funnel dataKey=\"value\" data={data} isAnimationActive>\n            <LabelList position=\"right\" fill=\"var(--fg)\" stroke=\"none\" dataKey=\"name\" />\n          </Funnel>\n        </RechartsFunnel>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/funnel-chart.tsx"
+    }
+  ]
+}

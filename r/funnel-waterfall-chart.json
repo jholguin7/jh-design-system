@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "funnel-waterfall-chart",
+  "type": "registry:component",
+  "title": "FunnelWaterfallChart",
+  "description": "Funnel as a waterfall (remaining vs lost)",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/funnel-waterfall-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  BarChart,\n  Bar,\n  XAxis,\n  YAxis,\n  Tooltip,\n  CartesianGrid,\n  Cell,\n} from \"recharts\";\n\nexport interface FunnelWaterfallStage {\n  name: string;\n  /** Absolute count at this stage. */\n  value: number;\n}\n\nexport interface FunnelWaterfallChartProps {\n  stages: FunnelWaterfallStage[];\n  height?: number;\n  className?: string;\n}\n\n/**\n * Funnel as a waterfall: each bar is the *drop* from the previous stage.\n * First stage shows full value; subsequent stages show the delta lost.\n */\nexport function FunnelWaterfallChart({\n  stages,\n  height = 240,\n  className,\n}: FunnelWaterfallChartProps) {\n  const data = stages.map((s, i) => {\n    const lost = i === 0 ? 0 : Math.max(0, stages[i - 1].value - s.value);\n    return {\n      name: s.name,\n      remaining: s.value,\n      lost,\n    };\n  });\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <BarChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>\n          <CartesianGrid strokeDasharray=\"3 3\" stroke=\"var(--border-subtle)\" />\n          <XAxis dataKey=\"name\" tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }} />\n          <YAxis tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }} />\n          <Tooltip />\n          <Bar dataKey=\"remaining\" stackId=\"a\">\n            {data.map((_, i) => (\n              <Cell key={i} fill=\"var(--primary)\" />\n            ))}\n          </Bar>\n          <Bar dataKey=\"lost\" stackId=\"a\" fill=\"var(--signal-danger)\" opacity={0.4} />\n        </BarChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/funnel-waterfall-chart.tsx"
+    }
+  ]
+}

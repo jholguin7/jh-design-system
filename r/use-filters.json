@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-filters",
+  "type": "registry:hook",
+  "title": "useFilters hook",
+  "description": "Controlled filter state",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-filters.ts",
+      "content": "\"use client\";\r\n\r\nimport { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from \"react\";\r\nimport { createElement } from \"react\";\r\n\r\nexport interface DashboardFilters {\r\n  date_from?: string;\r\n  date_to?: string;\r\n  month?: string;\r\n  interest_level?: string;   // comma-separated for multi-select: \"3,4,5\"\r\n  status?: string;           // comma-separated for multi-select: \"vendido,negociando\"\r\n  search?: string;\r\n  proyecto?: string;\r\n  max_msgs?: number;\r\n  hour?: number;\r\n}\r\n\r\ninterface FilterContextType {\r\n  filters: DashboardFilters;\r\n  updateFilter: <K extends keyof DashboardFilters>(key: K, value: DashboardFilters[K]) => void;\r\n  clearFilters: () => void;\r\n  params: Record<string, string | number>;\r\n}\r\n\r\nconst FilterContext = createContext<FilterContextType | null>(null);\r\n\r\nexport function FilterProvider({ children }: { children: ReactNode }) {\r\n  const [filters, setFilters] = useState<DashboardFilters>({});\r\n\r\n  const updateFilter = useCallback(<K extends keyof DashboardFilters>(key: K, value: DashboardFilters[K]) => {\r\n    setFilters(prev => ({ ...prev, [key]: value }));\r\n  }, []);\r\n\r\n  const clearFilters = useCallback(() => setFilters({}), []);\r\n\r\n  const params = useMemo(() => {\r\n    const p: Record<string, string | number> = {};\r\n    Object.entries(filters).forEach(([k, v]) => {\r\n      if (v !== undefined && v !== \"\") p[k] = v;\r\n    });\r\n    return p;\r\n  }, [filters]);\r\n\r\n  return createElement(\r\n    FilterContext.Provider,\r\n    { value: { filters, updateFilter, clearFilters, params } },\r\n    children\r\n  );\r\n}\r\n\r\nexport function useFilters() {\r\n  const ctx = useContext(FilterContext);\r\n  if (!ctx) {\r\n    throw new Error(\"useFilters must be used within a FilterProvider\");\r\n  }\r\n  return ctx;\r\n}\r\n",
+      "type": "registry:hook",
+      "target": "hooks/use-filters.ts"
+    }
+  ]
+}

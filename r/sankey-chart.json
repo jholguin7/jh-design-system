@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sankey-chart",
+  "type": "registry:component",
+  "title": "SankeyChart",
+  "description": "Recharts sankey diagram",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/sankey-chart.tsx",
+      "content": "\"use client\";\nimport { ResponsiveContainer, Sankey, Tooltip } from \"recharts\";\n\nexport interface SankeyNode {\n  name: string;\n}\nexport interface SankeyLink {\n  source: number;\n  target: number;\n  value: number;\n}\n\nexport interface SankeyChartProps {\n  nodes: SankeyNode[];\n  links: SankeyLink[];\n  height?: number;\n  className?: string;\n}\n\nexport function SankeyChart({\n  nodes,\n  links,\n  height = 320,\n  className,\n}: SankeyChartProps) {\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <Sankey\n          data={{ nodes, links }}\n          nodePadding={20}\n          link={{ stroke: \"var(--primary-light)\" }}\n          node={{ fill: \"var(--primary)\" }}\n        >\n          <Tooltip />\n        </Sankey>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/sankey-chart.tsx"
+    }
+  ]
+}

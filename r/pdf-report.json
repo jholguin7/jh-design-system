@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pdf-report",
+  "type": "registry:lib",
+  "title": "PDF report generator",
+  "description": "Generic generatePdf(data, opts) using jspdf",
+  "dependencies": [
+    "jspdf"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "lib/pdf-report.ts",
+      "content": "/**\n * Generic PDF report helper. Strips AIA domain coupling (funnel/leads/api).\n *\n * Consumers supply a `ReportData` shape and call `generatePdf(data, opts)`.\n * For more sophisticated reports (multi-section, KPIs, charts) extend this\n * file in your consumer app — registry copies the source verbatim, so you own it.\n */\nimport { jsPDF } from \"jspdf\";\n\nexport interface ReportColumn {\n  key: string;\n  label: string;\n  width?: number;\n}\n\nexport interface ReportData {\n  title: string;\n  subtitle?: string;\n  generatedAt?: Date;\n  columns: ReportColumn[];\n  rows: Record<string, string | number>[];\n}\n\nexport interface GeneratePdfOptions {\n  filename?: string;\n  /** Orientation: portrait or landscape */\n  orientation?: \"portrait\" | \"landscape\";\n  /** Page format (default: a4) */\n  format?: string | number[];\n  /** Optional branding header colour (hex). Defaults to neutral grey. */\n  brandColor?: string;\n}\n\nexport function generatePdf(data: ReportData, opts: GeneratePdfOptions = {}): jsPDF {\n  const {\n    orientation = \"portrait\",\n    format = \"a4\",\n    brandColor = \"#1b1b18\",\n  } = opts;\n\n  const doc = new jsPDF({ orientation, format, unit: \"pt\" });\n  const pageWidth = doc.internal.pageSize.getWidth();\n  const margin = 40;\n\n  // Title\n  doc.setFontSize(18);\n  doc.setTextColor(brandColor);\n  doc.text(data.title, margin, margin + 10);\n\n  // Subtitle\n  if (data.subtitle) {\n    doc.setFontSize(11);\n    doc.setTextColor(\"#6a6a64\");\n    doc.text(data.subtitle, margin, margin + 28);\n  }\n\n  // Generated-at footer (top-right)\n  const generatedAt = data.generatedAt ?? new Date();\n  doc.setFontSize(9);\n  doc.setTextColor(\"#959590\");\n  doc.text(generatedAt.toLocaleString(), pageWidth - margin, margin + 10, {\n    align: \"right\",\n  });\n\n  // Column headers\n  const tableTop = margin + 56;\n  const colCount = data.columns.length;\n  const colWidth = (pageWidth - 2 * margin) / colCount;\n\n  doc.setFontSize(10);\n  doc.setTextColor(brandColor);\n  data.columns.forEach((col, i) => {\n    doc.text(col.label, margin + i * colWidth, tableTop);\n  });\n\n  // Header underline\n  doc.setDrawColor(\"#e5e5e0\");\n  doc.line(margin, tableTop + 4, pageWidth - margin, tableTop + 4);\n\n  // Rows\n  doc.setTextColor(\"#1b1b18\");\n  let y = tableTop + 22;\n  for (const row of data.rows) {\n    if (y > doc.internal.pageSize.getHeight() - margin) {\n      doc.addPage();\n      y = margin + 20;\n    }\n    data.columns.forEach((col, i) => {\n      const v = row[col.key];\n      doc.text(String(v ?? \"\"), margin + i * colWidth, y);\n    });\n    y += 16;\n  }\n\n  return doc;\n}\n\n/** Helper: trigger browser download. */\nexport function downloadPdf(doc: jsPDF, filename: string): void {\n  doc.save(filename);\n}\n",
+      "type": "registry:lib",
+      "target": "lib/pdf-report.ts"
+    }
+  ]
+}

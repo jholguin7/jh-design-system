@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scatter-bubble-chart",
+  "type": "registry:component",
+  "title": "ScatterBubbleChart",
+  "description": "Scatter/bubble (r prop triggers bubble mode)",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/scatter-bubble-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  ScatterChart,\n  Scatter,\n  XAxis,\n  YAxis,\n  ZAxis,\n  Tooltip,\n  CartesianGrid,\n} from \"recharts\";\n\nexport interface ScatterPoint {\n  x: number;\n  y: number;\n  /** Optional radius — when present component renders as bubble */\n  r?: number;\n  name?: string;\n}\n\nexport interface ScatterBubbleChartProps {\n  points: ScatterPoint[];\n  xLabel?: string;\n  yLabel?: string;\n  height?: number;\n  className?: string;\n}\n\nexport function ScatterBubbleChart({\n  points,\n  xLabel,\n  yLabel,\n  height = 280,\n  className,\n}: ScatterBubbleChartProps) {\n  const isBubble = points.some((p) => typeof p.r === \"number\");\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <ScatterChart margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>\n          <CartesianGrid stroke=\"var(--border-subtle)\" />\n          <XAxis\n            type=\"number\"\n            dataKey=\"x\"\n            name={xLabel}\n            tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }}\n          />\n          <YAxis\n            type=\"number\"\n            dataKey=\"y\"\n            name={yLabel}\n            tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }}\n          />\n          {isBubble && <ZAxis type=\"number\" dataKey=\"r\" range={[40, 400]} />}\n          <Tooltip cursor={{ strokeDasharray: \"3 3\" }} />\n          <Scatter data={points} fill=\"var(--primary)\" />\n        </ScatterChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/scatter-bubble-chart.tsx"
+    }
+  ]
+}

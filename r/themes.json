@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "themes",
+  "type": "registry:lib",
+  "title": "Theme registry",
+  "description": "Theme presets (default-wvy + accent-orange) with light/dark overrides",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "lib/tokens/themes.ts",
+      "content": "/**\n * Theme registry. Each theme is a set of CSS variable overrides applied to <html>\n * via data-attribute (data-theme=\"<id>\"). ThemeProvider toggles this.\n *\n * Why CSS-only: zero JS bundle weight; instant theme switch; no remount.\n */\nexport interface Theme {\n  id: string;\n  label: string;\n  /** light-mode token overrides */\n  light: Record<string, string>;\n  /** dark-mode token overrides */\n  dark: Record<string, string>;\n}\n\nexport const themes: Theme[] = [\n  {\n    id: \"default-wvy\",\n    label: \"Wvy (yellow-green)\",\n    light: {\n      \"--primary\": \"#f8ff99\",\n      \"--primary-hover\": \"#f0f76e\",\n      \"--primary-light\": \"#fcffcc\",\n      \"--primary-faint\": \"#feffe8\",\n      \"--primary-dark\": \"#c8cc5c\",\n      \"--primary-fg\": \"#000000\",\n    },\n    dark: {\n      \"--primary\": \"#f8ff99\",\n      \"--primary-hover\": \"#f0f76e\",\n      \"--primary-light\": \"#fcffcc\",\n      \"--primary-faint\": \"#feffe8\",\n      \"--primary-dark\": \"#c8cc5c\",\n      \"--primary-fg\": \"#000000\",\n    },\n  },\n  {\n    id: \"accent-orange\",\n    label: \"Accent Orange\",\n    light: {\n      \"--primary\": \"#ff7a1a\",\n      \"--primary-hover\": \"#e66700\",\n      \"--primary-light\": \"#ffd1ab\",\n      \"--primary-faint\": \"#fff1e6\",\n      \"--primary-dark\": \"#cc5e00\",\n      \"--primary-fg\": \"#ffffff\",\n    },\n    dark: {\n      \"--primary\": \"#ff8c33\",\n      \"--primary-hover\": \"#ffa055\",\n      \"--primary-light\": \"#ffd1ab\",\n      \"--primary-faint\": \"#3a1d00\",\n      \"--primary-dark\": \"#cc5e00\",\n      \"--primary-fg\": \"#ffffff\",\n    },\n  },\n];\n\nexport const defaultThemeId = \"default-wvy\";\n",
+      "type": "registry:lib",
+      "target": "lib/tokens/themes.ts"
+    }
+  ]
+}

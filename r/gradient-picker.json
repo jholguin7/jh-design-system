@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gradient-picker",
+  "type": "registry:component",
+  "title": "GradientPicker",
+  "description": "Preset gradients + localStorage saved presets",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/molecules/gradient-picker.tsx",
+      "content": "\"use client\";\nimport { useState, useEffect } from \"react\";\nimport { cn } from \"../lib/cn\";\n\nexport interface GradientPreset {\n  id: string;\n  name: string;\n  stops: string[];\n}\n\nconst STORAGE = \"jh.gradients.saved\";\n\nexport interface GradientPickerProps {\n  /** Built-in presets (always shown first) */\n  presets?: GradientPreset[];\n  /** Currently selected gradient id */\n  value?: string;\n  onChange: (gradient: GradientPreset) => void;\n  /** Show a \"save current\" button — saves to localStorage by default */\n  allowSave?: boolean;\n  className?: string;\n}\n\nfunction loadSaved(): GradientPreset[] {\n  if (typeof window === \"undefined\") return [];\n  try {\n    return JSON.parse(localStorage.getItem(STORAGE) || \"[]\");\n  } catch {\n    return [];\n  }\n}\n\nexport function GradientPicker({\n  presets = [],\n  value,\n  onChange,\n  allowSave = false,\n  className,\n}: GradientPickerProps) {\n  const [saved, setSaved] = useState<GradientPreset[]>([]);\n\n  useEffect(() => {\n    setSaved(loadSaved());\n  }, []);\n\n  const all = [...presets, ...saved];\n\n  return (\n    <div className={cn(\"grid grid-cols-4 gap-2\", className)}>\n      {all.map((g) => {\n        const isSelected = g.id === value;\n        return (\n          <button\n            key={g.id}\n            type=\"button\"\n            aria-pressed={isSelected}\n            title={g.name}\n            onClick={() => onChange(g)}\n            className={cn(\n              \"h-9 rounded-md border transition-all\",\n              isSelected\n                ? \"border-[var(--primary)] ring-2 ring-[var(--primary)]/30\"\n                : \"border-[var(--border)]\",\n            )}\n            style={{\n              backgroundImage: `linear-gradient(90deg, ${g.stops.join(\",\")})`,\n            }}\n          />\n        );\n      })}\n      {allowSave && (\n        <div className=\"col-span-4 text-[10px] text-[var(--fg-muted)] mt-1\">\n          Saved: {saved.length} | Presets: {presets.length}\n        </div>\n      )}\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/molecules/gradient-picker.tsx"
+    }
+  ]
+}

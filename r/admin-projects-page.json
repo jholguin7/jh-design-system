@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "admin-projects-page",
+  "type": "registry:component",
+  "title": "AdminProjectsPage template",
+  "description": "Projects grid with create/configure",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/templates/admin-projects-page.tsx",
+      "content": "\"use client\";\nimport { cn } from \"../lib/cn\";\n\nexport interface AdminProject {\n  id: string;\n  name: string;\n  slug?: string;\n  status?: string;\n  members?: number;\n}\n\nexport interface AdminProjectsPageProps {\n  projects: AdminProject[];\n  onCreate?: () => void;\n  onConfigure?: (id: string) => void;\n  createLabel?: string;\n  configureLabel?: string;\n  className?: string;\n}\n\nexport function AdminProjectsPage({\n  projects,\n  onCreate,\n  onConfigure,\n  createLabel = \"New project\",\n  configureLabel = \"Configure\",\n  className,\n}: AdminProjectsPageProps) {\n  return (\n    <div className={cn(\"max-w-4xl mx-auto py-8 px-4\", className)}>\n      <div className=\"flex items-center justify-between mb-4\">\n        <h1 className=\"text-xl font-bold text-[var(--fg)]\">Projects</h1>\n        {onCreate && (\n          <button\n            type=\"button\"\n            onClick={onCreate}\n            className=\"rounded-md bg-[var(--primary)] text-[var(--primary-fg)] px-3 py-1.5 text-sm font-medium hover:bg-[var(--primary-hover)]\"\n          >\n            {createLabel}\n          </button>\n        )}\n      </div>\n      <div className=\"grid gap-3 md:grid-cols-2\">\n        {projects.map((p) => (\n          <article\n            key={p.id}\n            className=\"rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col gap-2\"\n          >\n            <header className=\"flex items-start justify-between gap-2\">\n              <div className=\"min-w-0\">\n                <h2 className=\"text-sm font-semibold text-[var(--fg)] truncate\">\n                  {p.name}\n                </h2>\n                {p.slug && (\n                  <p className=\"text-[11px] text-[var(--fg-muted)] truncate\">/{p.slug}</p>\n                )}\n              </div>\n              {p.status && (\n                <span className=\"text-[10px] uppercase px-2 py-0.5 rounded-full bg-[var(--bg-subtle)] text-[var(--fg-muted)]\">\n                  {p.status}\n                </span>\n              )}\n            </header>\n            <footer className=\"flex items-center justify-between mt-2 pt-2 border-t border-[var(--border-subtle)] text-xs text-[var(--fg-muted)]\">\n              <span>{p.members ?? 0} members</span>\n              {onConfigure && (\n                <button\n                  type=\"button\"\n                  onClick={() => onConfigure(p.id)}\n                  className=\"text-[var(--primary-dark)] hover:underline\"\n                >\n                  {configureLabel}\n                </button>\n              )}\n            </footer>\n          </article>\n        ))}\n      </div>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/templates/admin-projects-page.tsx"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cta-section",
+  "type": "registry:component",
+  "title": "CtaSection (landing)",
+  "description": "Centered CTA section",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/landing/cta-section.tsx",
+      "content": "\"use client\";\nimport { cn } from \"../lib/cn\";\n\nexport interface CtaSectionProps {\n  title: string;\n  subtitle?: string;\n  ctaLabel: string;\n  onCta?: () => void;\n  ctaHref?: string;\n  className?: string;\n}\n\nexport function CtaSection({\n  title,\n  subtitle,\n  ctaLabel,\n  onCta,\n  ctaHref,\n  className,\n}: CtaSectionProps) {\n  return (\n    <section className={cn(\"py-16 px-6 bg-[var(--primary-faint)]\", className)}>\n      <div className=\"max-w-3xl mx-auto flex flex-col items-center text-center gap-4\">\n        <h2 className=\"text-3xl font-bold text-[var(--fg)]\">{title}</h2>\n        {subtitle && (\n          <p className=\"text-base text-[var(--fg-secondary)] max-w-xl\">{subtitle}</p>\n        )}\n        {ctaHref ? (\n          <a\n            href={ctaHref}\n            className=\"mt-2 inline-flex items-center rounded-md bg-[var(--primary)] text-[var(--primary-fg)] px-5 py-2.5 text-sm font-medium hover:bg-[var(--primary-hover)]\"\n          >\n            {ctaLabel}\n          </a>\n        ) : (\n          <button\n            type=\"button\"\n            onClick={onCta}\n            className=\"mt-2 inline-flex items-center rounded-md bg-[var(--primary)] text-[var(--primary-fg)] px-5 py-2.5 text-sm font-medium hover:bg-[var(--primary-hover)]\"\n          >\n            {ctaLabel}\n          </button>\n        )}\n      </div>\n    </section>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/landing/cta-section.tsx"
+    }
+  ]
+}

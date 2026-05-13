@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-media-query",
+  "type": "registry:hook",
+  "title": "useMediaQuery hook",
+  "description": "Reactively read a CSS media query",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-media-query.ts",
+      "content": "import { useState, useEffect } from \"react\";\n\nexport function useMediaQuery(query: string): boolean {\n  const [matches, setMatches] = useState(false);\n\n  useEffect(() => {\n    const mql = window.matchMedia(query);\n    setMatches(mql.matches);\n    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);\n    mql.addEventListener(\"change\", handler);\n    return () => mql.removeEventListener(\"change\", handler);\n  }, [query]);\n\n  return matches;\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-media-query.ts"
+    }
+  ]
+}

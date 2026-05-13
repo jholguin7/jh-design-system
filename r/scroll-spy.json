@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-spy",
+  "type": "registry:component",
+  "title": "ScrollSpy (landing)",
+  "description": "In-page section indicator",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/landing/scroll-spy.tsx",
+      "content": "\"use client\";\nimport { useEffect, useState } from \"react\";\nimport { cn } from \"../lib/cn\";\n\nexport interface ScrollSpyItem {\n  id: string;\n  label: string;\n}\n\nexport interface ScrollSpyProps {\n  items: ScrollSpyItem[];\n  /** Offset in px from top before a section is considered \"active\" */\n  offset?: number;\n  className?: string;\n}\n\nexport function ScrollSpy({ items, offset = 80, className }: ScrollSpyProps) {\n  const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);\n\n  useEffect(() => {\n    if (typeof window === \"undefined\") return;\n    const onScroll = () => {\n      for (let i = items.length - 1; i >= 0; i--) {\n        const el = document.getElementById(items[i].id);\n        if (!el) continue;\n        const top = el.getBoundingClientRect().top;\n        if (top <= offset) {\n          setActiveId(items[i].id);\n          return;\n        }\n      }\n      setActiveId(items[0]?.id ?? null);\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    onScroll();\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, [items, offset]);\n\n  return (\n    <nav className={cn(\"flex flex-col gap-1\", className)} aria-label=\"Scroll spy\">\n      {items.map((item) => (\n        <a\n          key={item.id}\n          href={`#${item.id}`}\n          aria-current={activeId === item.id ? \"true\" : undefined}\n          className={cn(\n            \"px-2 py-1 text-xs rounded transition-colors\",\n            activeId === item.id\n              ? \"text-[var(--fg)] font-medium\"\n              : \"text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]\",\n          )}\n        >\n          {item.label}\n        </a>\n      ))}\n    </nav>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/landing/scroll-spy.tsx"
+    }
+  ]
+}

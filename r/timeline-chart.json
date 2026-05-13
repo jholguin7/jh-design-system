@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "timeline-chart",
+  "type": "registry:component",
+  "title": "TimelineChart",
+  "description": "Generic temporal line chart",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/timeline-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  LineChart,\n  Line,\n  XAxis,\n  YAxis,\n  Tooltip,\n  CartesianGrid,\n} from \"recharts\";\n\nexport interface TimelineEvent {\n  date: string | number | Date;\n  label?: string;\n  value: number;\n}\n\nexport interface TimelineChartProps {\n  events: TimelineEvent[];\n  height?: number;\n  className?: string;\n}\n\nexport function TimelineChart({\n  events,\n  height = 240,\n  className,\n}: TimelineChartProps) {\n  const data = events.map((e) => ({\n    ...e,\n    dateLabel: typeof e.date === \"string\" ? e.date : new Date(e.date).toLocaleDateString(),\n  }));\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <LineChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>\n          <CartesianGrid strokeDasharray=\"3 3\" stroke=\"var(--border-subtle)\" />\n          <XAxis dataKey=\"dateLabel\" tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }} />\n          <YAxis tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }} />\n          <Tooltip />\n          <Line\n            type=\"monotone\"\n            dataKey=\"value\"\n            stroke=\"var(--primary)\"\n            strokeWidth={2}\n            dot={{ r: 3, fill: \"var(--primary-dark)\" }}\n          />\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/timeline-chart.tsx"
+    }
+  ]
+}

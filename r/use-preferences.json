@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-preferences",
+  "type": "registry:hook",
+  "title": "usePreferences hook + adapter",
+  "description": "Theme/lang/density/sidebar prefs with pluggable adapter (localStorage default)",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-preferences.tsx",
+      "content": "\"use client\";\nimport { createContext, useContext, useEffect, useState, type ReactNode } from \"react\";\n\nexport interface Preferences {\n  theme: \"light\" | \"dark\";\n  lang: \"es\" | \"en\";\n  density: \"compact\" | \"comfortable\";\n  sidebarCollapsed: boolean;\n}\n\nconst DEFAULTS: Preferences = {\n  theme: \"light\",\n  lang: \"es\",\n  density: \"comfortable\",\n  sidebarCollapsed: false,\n};\n\nexport interface PrefsAdapter {\n  load(): Promise<Partial<Preferences>>;\n  save(p: Partial<Preferences>): Promise<void>;\n}\n\n/** Default adapter: localStorage. Consumer can pass Firebase/Supabase/Mongo adapter. */\nexport const localStorageAdapter: PrefsAdapter = {\n  async load() {\n    if (typeof window === \"undefined\") return {};\n    try {\n      return JSON.parse(localStorage.getItem(\"jh.prefs\") || \"{}\");\n    } catch {\n      return {};\n    }\n  },\n  async save(p) {\n    if (typeof window === \"undefined\") return;\n    try {\n      const curr = JSON.parse(localStorage.getItem(\"jh.prefs\") || \"{}\");\n      localStorage.setItem(\"jh.prefs\", JSON.stringify({ ...curr, ...p }));\n    } catch {\n      /* ignore */\n    }\n  },\n};\n\ninterface PrefsCtx extends Preferences {\n  setTheme: (t: \"light\" | \"dark\") => void;\n  setLang: (l: \"es\" | \"en\") => void;\n  setDensity: (d: \"compact\" | \"comfortable\") => void;\n  setSidebarCollapsed: (b: boolean) => void;\n}\n\nconst Ctx = createContext<PrefsCtx | null>(null);\n\nexport function PreferencesProvider({\n  children,\n  adapter = localStorageAdapter,\n}: {\n  children: ReactNode;\n  adapter?: PrefsAdapter;\n}) {\n  const [prefs, setPrefs] = useState<Preferences>(DEFAULTS);\n  useEffect(() => {\n    adapter.load().then((p) => setPrefs((prev) => ({ ...prev, ...p })));\n  }, [adapter]);\n  const update = (p: Partial<Preferences>) => {\n    setPrefs((prev) => ({ ...prev, ...p }));\n    adapter.save(p);\n  };\n  return (\n    <Ctx.Provider\n      value={{\n        ...prefs,\n        setTheme: (t) => update({ theme: t }),\n        setLang: (l) => update({ lang: l }),\n        setDensity: (d) => update({ density: d }),\n        setSidebarCollapsed: (b) => update({ sidebarCollapsed: b }),\n      }}\n    >\n      {children}\n    </Ctx.Provider>\n  );\n}\n\nexport function usePreferences(): PrefsCtx {\n  const c = useContext(Ctx);\n  if (!c) throw new Error(\"usePreferences must be used within PreferencesProvider\");\n  return c;\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-preferences.tsx"
+    }
+  ]
+}

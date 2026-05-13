@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bump-chart",
+  "type": "registry:component",
+  "title": "BumpChart",
+  "description": "Ranking over time (reversed Y axis)",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/bump-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  LineChart,\n  Line,\n  XAxis,\n  YAxis,\n  Tooltip,\n  Legend,\n  CartesianGrid,\n} from \"recharts\";\n\nexport interface BumpSeries {\n  name: string;\n  /** Rank at each period (1 = top) */\n  ranks: number[];\n  color?: string;\n}\n\nexport interface BumpChartProps {\n  /** Period labels (e.g. months) */\n  periods: string[];\n  series: BumpSeries[];\n  height?: number;\n  className?: string;\n}\n\nconst DEFAULT_COLORS = [\n  \"var(--primary)\",\n  \"var(--signal-ok)\",\n  \"var(--signal-warn)\",\n  \"var(--signal-danger)\",\n];\n\nexport function BumpChart({\n  periods,\n  series,\n  height = 280,\n  className,\n}: BumpChartProps) {\n  const data = periods.map((p, i) => {\n    const row: Record<string, number | string> = { period: p };\n    for (const s of series) row[s.name] = s.ranks[i] ?? 0;\n    return row;\n  });\n  const maxRank = Math.max(...series.flatMap((s) => s.ranks));\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <LineChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>\n          <CartesianGrid strokeDasharray=\"3 3\" stroke=\"var(--border-subtle)\" />\n          <XAxis dataKey=\"period\" tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }} />\n          <YAxis\n            reversed\n            domain={[1, maxRank]}\n            tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }}\n          />\n          <Tooltip />\n          <Legend wrapperStyle={{ fontSize: 11 }} />\n          {series.map((s, i) => (\n            <Line\n              key={s.name}\n              dataKey={s.name}\n              stroke={s.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]}\n              strokeWidth={2}\n              dot={{ r: 4 }}\n              type=\"monotone\"\n            />\n          ))}\n        </LineChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/bump-chart.tsx"
+    }
+  ]
+}

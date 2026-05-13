@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mobile-header",
+  "type": "registry:component",
+  "title": "MobileHeader",
+  "description": "Mobile header with hamburger + right slot",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/layout/mobile-header.tsx",
+      "content": "\"use client\";\nimport { Menu } from \"lucide-react\";\nimport { cn } from \"../lib/cn\";\n\nexport interface MobileHeaderProps {\n  title?: string;\n  onMenuClick?: () => void;\n  rightSlot?: React.ReactNode;\n  className?: string;\n}\n\nexport function MobileHeader({\n  title,\n  onMenuClick,\n  rightSlot,\n  className,\n}: MobileHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"flex items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 md:hidden\",\n        className,\n      )}\n    >\n      <div className=\"flex items-center gap-2 min-w-0\">\n        {onMenuClick && (\n          <button\n            type=\"button\"\n            aria-label=\"Open menu\"\n            onClick={onMenuClick}\n            className=\"p-1.5 rounded-md text-[var(--fg-secondary)] hover:bg-[var(--bg-subtle)]\"\n          >\n            <Menu className=\"h-5 w-5\" />\n          </button>\n        )}\n        {title && (\n          <h1 className=\"text-[14px] font-semibold text-[var(--fg)] truncate\">{title}</h1>\n        )}\n      </div>\n      {rightSlot && <div className=\"flex items-center gap-1 shrink-0\">{rightSlot}</div>}\n    </header>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/layout/mobile-header.tsx"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "nested-tabs",
+  "type": "registry:component",
+  "title": "NestedTabs template",
+  "description": "Generic tab switcher with localStorage persistence",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/templates/nested-tabs.tsx",
+      "content": "\"use client\";\nimport { useState, useEffect } from \"react\";\nimport { cn } from \"../lib/cn\";\n\nexport interface NestedTab {\n  id: string;\n  label: string;\n  content: React.ReactNode;\n}\n\nexport interface NestedTabsProps {\n  tabs: NestedTab[];\n  /** Controlled active id. If omitted, component is self-managed. */\n  activeId?: string;\n  onChange?: (id: string) => void;\n  /** When set, persists active tab to localStorage under this key. */\n  storageKey?: string;\n  className?: string;\n}\n\nexport function NestedTabs({\n  tabs,\n  activeId,\n  onChange,\n  storageKey,\n  className,\n}: NestedTabsProps) {\n  const initial = tabs[0]?.id ?? \"\";\n  const [internal, setInternal] = useState<string>(activeId ?? initial);\n\n  useEffect(() => {\n    if (!storageKey || typeof window === \"undefined\") return;\n    const stored = localStorage.getItem(storageKey);\n    if (stored && tabs.find((t) => t.id === stored)) setInternal(stored);\n  }, [storageKey, tabs]);\n\n  const current = activeId ?? internal;\n\n  const setActive = (id: string) => {\n    if (!activeId) setInternal(id);\n    onChange?.(id);\n    if (storageKey && typeof window !== \"undefined\") {\n      try {\n        localStorage.setItem(storageKey, id);\n      } catch {\n        /* ignore */\n      }\n    }\n  };\n\n  const active = tabs.find((t) => t.id === current) ?? tabs[0];\n\n  return (\n    <div className={cn(\"flex flex-col gap-3\", className)}>\n      <div\n        role=\"tablist\"\n        aria-orientation=\"horizontal\"\n        className=\"flex items-center gap-1 border-b border-[var(--border)]\"\n      >\n        {tabs.map((tab) => {\n          const isActive = tab.id === active?.id;\n          return (\n            <button\n              key={tab.id}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={isActive}\n              onClick={() => setActive(tab.id)}\n              className={cn(\n                \"px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors\",\n                isActive\n                  ? \"border-[var(--primary)] text-[var(--fg)]\"\n                  : \"border-transparent text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]\",\n              )}\n            >\n              {tab.label}\n            </button>\n          );\n        })}\n      </div>\n      <div role=\"tabpanel\" className=\"flex-1\">\n        {active?.content}\n      </div>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/templates/nested-tabs.tsx"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-picker",
+  "type": "registry:ui",
+  "title": "DatePicker",
+  "description": "Locale-aware date picker (es/en) backed by react-day-picker",
+  "dependencies": [
+    "react-day-picker",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/popover.json",
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/use-lang.json",
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/use-media-query.json"
+  ],
+  "files": [
+    {
+      "path": "components/ui/date-picker.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useState } from \"react\";\r\nimport { DayPicker } from \"react-day-picker\";\r\nimport \"react-day-picker/style.css\";\r\nimport { es, enUS } from \"react-day-picker/locale\";\r\nimport { Calendar as CalendarIcon } from \"lucide-react\";\r\nimport { Popover, PopoverContent, PopoverTrigger } from \"./popover\";\r\nimport { useLang } from \"../hooks/use-lang\";\r\nimport { useMediaQuery } from \"../hooks/use-media-query\";\r\n\r\ninterface DatePickerProps {\r\n  value?: string; // YYYY-MM-DD\r\n  onChange: (value: string | undefined) => void;\r\n  placeholder?: string;\r\n  className?: string;\r\n}\r\n\r\nfunction parseDate(str?: string): Date | undefined {\r\n  if (!str) return undefined;\r\n  const [y, m, d] = str.split(\"-\").map(Number);\r\n  if (!y || !m || !d) return undefined;\r\n  return new Date(y, m - 1, d);\r\n}\r\n\r\nfunction formatDate(date: Date | undefined, lang: string): string {\r\n  if (!date) return \"\";\r\n  return date.toLocaleDateString(lang === \"es\" ? \"es-ES\" : \"en-US\", {\r\n    day: \"numeric\",\r\n    month: \"short\",\r\n    year: \"numeric\",\r\n  });\r\n}\r\n\r\nfunction toIso(date: Date): string {\r\n  const y = date.getFullYear();\r\n  const m = String(date.getMonth() + 1).padStart(2, \"0\");\r\n  const d = String(date.getDate()).padStart(2, \"0\");\r\n  return `${y}-${m}-${d}`;\r\n}\r\n\r\nexport function DatePicker({ value, onChange, placeholder, className }: DatePickerProps) {\r\n  const [open, setOpen] = useState(false);\r\n  const { lang } = useLang();\r\n  const selected = parseDate(value);\r\n  const isDesktop = useMediaQuery(\"(min-width: 768px)\");\r\n\r\n  return (\r\n    <Popover open={open} onOpenChange={setOpen}>\r\n      <PopoverTrigger asChild>\r\n        <button\r\n          type=\"button\"\r\n          className={`inline-flex items-center gap-1.5 rounded-lg h-9 px-3 text-xs border border-[var(--border)] bg-[var(--bg-card)] text-[var(--fg)] hover:border-[var(--primary)] focus:border-[var(--primary)] focus:outline-none transition-colors ${!value ? \"text-[var(--fg-muted)]\" : \"\"} ${className || \"\"}`}\r\n        >\r\n          <CalendarIcon className=\"h-3 w-3 shrink-0 opacity-60\" />\r\n          <span>{selected ? formatDate(selected, lang) : placeholder || \"Pick date\"}</span>\r\n        </button>\r\n      </PopoverTrigger>\r\n      <PopoverContent\r\n        align={isDesktop ? \"start\" : \"center\"}\r\n        className={isDesktop ? \"w-auto p-2\" : \"w-[calc(100vw-24px)] p-2\"}\r\n      >\r\n        <DayPicker\r\n          mode=\"single\"\r\n          selected={selected}\r\n          onSelect={(date) => {\r\n            onChange(date ? toIso(date) : undefined);\r\n            setOpen(false);\r\n          }}\r\n          locale={lang === \"es\" ? es : enUS}\r\n          className={isDesktop ? \"\" : \"w-full [&_.rdp-month]:w-full [&_.rdp-month_table]:w-full\"}\r\n          style={{\r\n            \"--rdp-accent-color\": \"var(--primary)\",\r\n            \"--rdp-accent-background-color\": \"color-mix(in srgb, var(--primary) 15%, transparent)\",\r\n            \"--rdp-day-height\": isDesktop ? \"28px\" : \"44px\",\r\n            \"--rdp-day-width\": isDesktop ? \"28px\" : \"44px\",\r\n            \"--rdp-day_button-height\": isDesktop ? \"28px\" : \"44px\",\r\n            \"--rdp-day_button-width\": isDesktop ? \"28px\" : \"44px\",\r\n            fontSize: isDesktop ? \"12px\" : \"15px\",\r\n          } as React.CSSProperties}\r\n        />\r\n        {value && (\r\n          <div className=\"border-t border-[var(--border-subtle)] px-2 py-1.5 mt-1\">\r\n            <button\r\n              type=\"button\"\r\n              onClick={() => { onChange(undefined); setOpen(false); }}\r\n              className=\"text-[11px] text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors\"\r\n            >\r\n              {lang === \"es\" ? \"Limpiar\" : \"Clear\"}\r\n            </button>\r\n          </div>\r\n        )}\r\n      </PopoverContent>\r\n    </Popover>\r\n  );\r\n}\r\n",
+      "type": "registry:ui",
+      "target": "components/ui/date-picker.tsx"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pie-chart",
+  "type": "registry:component",
+  "title": "PieChart",
+  "description": "Generic pie/donut chart",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/pie-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  PieChart as RechartsPie,\n  Pie,\n  Cell,\n  Tooltip,\n  Legend,\n} from \"recharts\";\n\nexport interface PieSlice {\n  name: string;\n  value: number;\n}\n\nexport interface PieChartProps {\n  slices: PieSlice[];\n  /** Optional palette override; defaults to CSS-variable-based palette */\n  colors?: string[];\n  height?: number;\n  /** Render as donut */\n  donut?: boolean;\n  className?: string;\n}\n\nconst DEFAULT_COLORS = [\n  \"var(--primary)\",\n  \"var(--primary-hover)\",\n  \"var(--primary-dark)\",\n  \"var(--signal-ok)\",\n  \"var(--signal-warn)\",\n  \"var(--signal-danger)\",\n  \"var(--fg-muted)\",\n];\n\nexport function PieChart({\n  slices,\n  colors = DEFAULT_COLORS,\n  height = 240,\n  donut = false,\n  className,\n}: PieChartProps) {\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <RechartsPie>\n          <Pie\n            data={slices}\n            dataKey=\"value\"\n            cx=\"50%\"\n            cy=\"50%\"\n            innerRadius={donut ? 50 : 0}\n            outerRadius={80}\n            paddingAngle={1}\n          >\n            {slices.map((_, i) => (\n              <Cell key={i} fill={colors[i % colors.length]} />\n            ))}\n          </Pie>\n          <Tooltip />\n          <Legend wrapperStyle={{ fontSize: 11 }} />\n        </RechartsPie>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/pie-chart.tsx"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mobile-bottom-nav",
+  "type": "registry:component",
+  "title": "MobileBottomNav",
+  "description": "Mobile bottom tab nav (parametrized tabs)",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/layout/mobile-bottom-nav.tsx",
+      "content": "\"use client\";\nimport Link from \"next/link\";\nimport { usePathname } from \"next/navigation\";\nimport { cn } from \"../lib/cn\";\n\nexport interface MobileTab {\n  href: string;\n  label: string;\n  icon: React.ComponentType<{ className?: string }>;\n}\n\nexport interface MobileBottomNavProps {\n  tabs: MobileTab[];\n  className?: string;\n}\n\nexport function MobileBottomNav({ tabs, className }: MobileBottomNavProps) {\n  const pathname = usePathname();\n  return (\n    <nav\n      className={cn(\n        \"fixed bottom-0 left-0 right-0 z-30 flex justify-around border-t border-[var(--border)] bg-[var(--bg-card)] py-1.5 md:hidden\",\n        className,\n      )}\n      aria-label=\"Mobile navigation\"\n    >\n      {tabs.map((tab) => {\n        const isActive = pathname === tab.href;\n        const Icon = tab.icon;\n        return (\n          <Link\n            key={tab.href}\n            href={tab.href}\n            aria-current={isActive ? \"page\" : undefined}\n            className={cn(\n              \"flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-md text-[10px] font-medium transition-colors\",\n              isActive\n                ? \"text-[var(--primary-dark)]\"\n                : \"text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]\",\n            )}\n          >\n            <Icon className=\"h-5 w-5\" />\n            <span>{tab.label}</span>\n          </Link>\n        );\n      })}\n    </nav>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/layout/mobile-bottom-nav.tsx"
+    }
+  ]
+}

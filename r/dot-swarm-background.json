@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dot-swarm-background",
+  "type": "registry:component",
+  "title": "DotSwarmBackground (landing)",
+  "description": "Animated dot swarm canvas background",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/landing/dot-swarm-background.tsx",
+      "content": "\"use client\";\nimport { useEffect, useRef } from \"react\";\nimport { cn } from \"../lib/cn\";\n\nexport interface DotSwarmBackgroundProps {\n  /** Number of dots */\n  count?: number;\n  /** Speed multiplier (0..2 reasonable) */\n  speed?: number;\n  className?: string;\n}\n\ninterface Dot {\n  x: number;\n  y: number;\n  vx: number;\n  vy: number;\n  r: number;\n}\n\n/**\n * Animated dot swarm canvas. Renders behind hero/landing sections.\n * Pure CSS-token coloured (uses --primary).\n */\nexport function DotSwarmBackground({\n  count = 60,\n  speed = 0.6,\n  className,\n}: DotSwarmBackgroundProps) {\n  const canvasRef = useRef<HTMLCanvasElement | null>(null);\n\n  useEffect(() => {\n    const canvas = canvasRef.current;\n    if (!canvas) return;\n    const ctx = canvas.getContext(\"2d\");\n    if (!ctx) return;\n\n    let raf = 0;\n    let running = true;\n    const dots: Dot[] = [];\n\n    const resize = () => {\n      const rect = canvas.getBoundingClientRect();\n      canvas.width = rect.width * window.devicePixelRatio;\n      canvas.height = rect.height * window.devicePixelRatio;\n      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);\n    };\n\n    const init = () => {\n      resize();\n      dots.length = 0;\n      const w = canvas.clientWidth;\n      const h = canvas.clientHeight;\n      for (let i = 0; i < count; i++) {\n        dots.push({\n          x: Math.random() * w,\n          y: Math.random() * h,\n          vx: (Math.random() - 0.5) * speed,\n          vy: (Math.random() - 0.5) * speed,\n          r: 1 + Math.random() * 1.5,\n        });\n      }\n    };\n\n    const color = getComputedStyle(canvas).getPropertyValue(\"--primary\") || \"#888\";\n\n    const draw = () => {\n      if (!running) return;\n      const w = canvas.clientWidth;\n      const h = canvas.clientHeight;\n      ctx.clearRect(0, 0, w, h);\n      for (const d of dots) {\n        d.x += d.vx;\n        d.y += d.vy;\n        if (d.x < 0 || d.x > w) d.vx *= -1;\n        if (d.y < 0 || d.y > h) d.vy *= -1;\n        ctx.beginPath();\n        ctx.fillStyle = color.trim();\n        ctx.globalAlpha = 0.4;\n        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);\n        ctx.fill();\n      }\n      raf = requestAnimationFrame(draw);\n    };\n\n    init();\n    draw();\n    window.addEventListener(\"resize\", init);\n    return () => {\n      running = false;\n      cancelAnimationFrame(raf);\n      window.removeEventListener(\"resize\", init);\n    };\n  }, [count, speed]);\n\n  return (\n    <canvas\n      ref={canvasRef}\n      className={cn(\"absolute inset-0 pointer-events-none\", className)}\n      aria-hidden\n    />\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/landing/dot-swarm-background.tsx"
+    }
+  ]
+}

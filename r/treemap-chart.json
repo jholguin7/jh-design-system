@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "treemap-chart",
+  "type": "registry:component",
+  "title": "TreemapChart",
+  "description": "Recharts treemap",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/treemap-chart.tsx",
+      "content": "\"use client\";\nimport { ResponsiveContainer, Treemap, Tooltip } from \"recharts\";\n\nexport interface TreemapNode {\n  name: string;\n  size?: number;\n  children?: TreemapNode[];\n  [key: string]: unknown;\n}\n\nexport interface TreemapChartProps {\n  data: TreemapNode[];\n  height?: number;\n  className?: string;\n}\n\nexport function TreemapChart({ data, height = 280, className }: TreemapChartProps) {\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <Treemap\n          data={data}\n          dataKey=\"size\"\n          stroke=\"var(--bg-card)\"\n          fill=\"var(--primary)\"\n        >\n          <Tooltip />\n        </Treemap>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/treemap-chart.tsx"
+    }
+  ]
+}

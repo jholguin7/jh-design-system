@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "radial-time-chart",
+  "type": "registry:component",
+  "title": "RadialTimeChart",
+  "description": "Hourly/weekday rose chart",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/radial-time-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  RadialBarChart,\n  RadialBar,\n  PolarAngleAxis,\n  Tooltip,\n} from \"recharts\";\n\nexport type RadialMode = \"hour\" | \"weekday\" | \"custom\";\n\nexport interface RadialTimeSlot {\n  /** Label for axis (e.g. \"Mon\", \"00:00\") */\n  label: string;\n  value: number;\n}\n\nexport interface RadialTimeChartProps {\n  slots: RadialTimeSlot[];\n  mode?: RadialMode;\n  height?: number;\n  /** Max for circular gauge (default: max of data * 1.1) */\n  max?: number;\n  className?: string;\n}\n\nexport function RadialTimeChart({\n  slots,\n  height = 280,\n  max,\n  className,\n}: RadialTimeChartProps) {\n  const peak = max ?? Math.max(...slots.map((s) => s.value), 1) * 1.1;\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <RadialBarChart\n          innerRadius=\"20%\"\n          outerRadius=\"90%\"\n          data={slots}\n          startAngle={90}\n          endAngle={-270}\n        >\n          <PolarAngleAxis\n            type=\"number\"\n            domain={[0, peak]}\n            angleAxisId={0}\n            tick={false}\n          />\n          <RadialBar\n            background={{ fill: \"var(--bg-subtle)\" } as never}\n            dataKey=\"value\"\n            fill=\"var(--primary)\"\n            label={{ position: \"insideStart\", fill: \"var(--fg)\", fontSize: 10 }}\n          />\n          <Tooltip />\n        </RadialBarChart>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/radial-time-chart.tsx"
+    }
+  ]
+}

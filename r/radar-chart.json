@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "radar-chart",
+  "type": "registry:component",
+  "title": "RadarChart",
+  "description": "Generic radar (multiple series across axes)",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/radar-chart.tsx",
+      "content": "\"use client\";\nimport {\n  ResponsiveContainer,\n  RadarChart as RechartsRadar,\n  PolarGrid,\n  PolarAngleAxis,\n  PolarRadiusAxis,\n  Radar,\n  Tooltip,\n  Legend,\n} from \"recharts\";\n\nexport interface RadarSeries {\n  name: string;\n  values: number[];\n  color?: string;\n}\n\nexport interface RadarChartProps {\n  axes: string[];\n  series: RadarSeries[];\n  height?: number;\n  className?: string;\n}\n\nconst DEFAULT_COLORS = [\"var(--primary)\", \"var(--signal-ok)\", \"var(--signal-warn)\"];\n\nexport function RadarChart({\n  axes,\n  series,\n  height = 280,\n  className,\n}: RadarChartProps) {\n  // Reshape: axes-major, one row per axis with each series value\n  const data = axes.map((axis, axisIdx) => {\n    const row: Record<string, number | string> = { axis };\n    for (const s of series) row[s.name] = s.values[axisIdx] ?? 0;\n    return row;\n  });\n  return (\n    <div className={className} style={{ width: \"100%\", height }}>\n      <ResponsiveContainer>\n        <RechartsRadar data={data}>\n          <PolarGrid stroke=\"var(--border-subtle)\" />\n          <PolarAngleAxis dataKey=\"axis\" tick={{ fill: \"var(--fg-muted)\", fontSize: 11 }} />\n          <PolarRadiusAxis tick={{ fill: \"var(--fg-muted)\", fontSize: 10 }} />\n          {series.map((s, i) => (\n            <Radar\n              key={s.name}\n              name={s.name}\n              dataKey={s.name}\n              stroke={s.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]}\n              fill={s.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]}\n              fillOpacity={0.3}\n            />\n          ))}\n          <Tooltip />\n          <Legend wrapperStyle={{ fontSize: 11 }} />\n        </RechartsRadar>\n      </ResponsiveContainer>\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/charts/radar-chart.tsx"
+    }
+  ]
+}

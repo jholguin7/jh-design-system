@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "social-proof",
+  "type": "registry:component",
+  "title": "SocialProof (landing)",
+  "description": "Logo row with optional heading",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/cn.json"
+  ],
+  "files": [
+    {
+      "path": "components/landing/social-proof.tsx",
+      "content": "\"use client\";\nimport { cn } from \"../lib/cn\";\n\nexport interface SocialProofLogo {\n  name: string;\n  src: string;\n}\n\nexport interface SocialProofProps {\n  logos: SocialProofLogo[];\n  heading?: string;\n  className?: string;\n}\n\nexport function SocialProof({ logos, heading, className }: SocialProofProps) {\n  return (\n    <section className={cn(\"py-12 px-6\", className)}>\n      <div className=\"max-w-5xl mx-auto flex flex-col items-center gap-6\">\n        {heading && (\n          <p className=\"text-xs uppercase tracking-wider text-[var(--fg-muted)]\">{heading}</p>\n        )}\n        <div className=\"flex flex-wrap items-center justify-center gap-x-10 gap-y-6\">\n          {logos.map((l, i) => (\n            // eslint-disable-next-line @next/next/no-img-element\n            <img\n              key={i}\n              src={l.src}\n              alt={l.name}\n              className=\"h-7 opacity-60 hover:opacity-100 transition-opacity\"\n            />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/landing/social-proof.tsx"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-sort",
+  "type": "registry:hook",
+  "title": "useSort hook",
+  "description": "Controlled sort state for tables",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-sort.ts",
+      "content": "\"use client\";\n\nimport { useState, useCallback } from \"react\";\n\nexport type SortDir = \"asc\" | \"desc\";\nexport interface SortState { key: string; dir: SortDir; }\n\nexport function useSort(defaultKey = \"\", defaultDir: SortDir = \"asc\") {\n  const [sort, setSort] = useState<SortState>({ key: defaultKey, dir: defaultDir });\n\n  const toggle = useCallback((key: string) => {\n    setSort(prev => {\n      if (prev.key === key) return { key, dir: prev.dir === \"asc\" ? \"desc\" : \"asc\" };\n      return { key, dir: \"asc\" };\n    });\n  }, []);\n\n  return { sort, toggle };\n}\n\n/** Generic client-side sort — works with any object array */\n// eslint-disable-next-line @typescript-eslint/no-explicit-any\nexport function sortLeads<T>(items: T[], sort: SortState): T[] {\n  if (!sort.key) return items;\n  const k = sort.key;\n  const dir = sort.dir === \"asc\" ? 1 : -1;\n  return [...items].sort((a, b) => {\n    const av = getValue(a as Record<string, unknown>, k);\n    const bv = getValue(b as Record<string, unknown>, k);\n    if (av == null && bv == null) return 0;\n    if (av == null) return 1;\n    if (bv == null) return -1;\n    if (typeof av === \"number\" && typeof bv === \"number\") return (av - bv) * dir;\n    return String(av).localeCompare(String(bv)) * dir;\n  });\n}\n\nconst KEY_MAP: Record<string, string> = {\n  name: \"display_name\",\n  msgs: \"message_count\",\n  asesor: \"asesor-asignado\",\n  summary: \"chat-summary\",\n  notes: \"notas\",\n};\n\nconst DATE_FIELDS = new Set([\"appointment\", \"end-date\", \"created_at\", \"updated_at\"]);\n\nfunction getValue(item: Record<string, unknown>, key: string): string | number | null {\n  const field = KEY_MAP[key] || key;\n  const v = item[field];\n  // For asesor-asignado, empty/legacy values display as \"AI\" — sort consistently.\n  if (field === \"asesor-asignado\") {\n    if (v == null || typeof v !== \"string\") return \"AI\";\n    const trimmed = v.trim();\n    if (!trimmed || trimmed === \"n/a\" || trimmed === \"-\" || trimmed.toLowerCase() === \"ai\" || trimmed.toLowerCase() === \"bot\") return \"AI\";\n    return trimmed;\n  }\n  if (v == null || v === \"n/a\" || v === \"\") return null;\n  if (typeof v === \"number\") return v;\n  if (typeof v === \"string\") {\n    if (field === \"msg-count\") return Number(v) || 0;\n    if (DATE_FIELDS.has(field)) {\n      const ts = new Date(v).getTime();\n      return isNaN(ts) ? null : ts;\n    }\n    return v;\n  }\n  return null;\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-sort.ts"
+    }
+  ]
+}

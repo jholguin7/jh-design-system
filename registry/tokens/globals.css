@@ -1,0 +1,382 @@
+
+/* ── Light theme ── */
+:root {
+  --bg: #f8f8f5;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #f2f2ee;
+  --bg-muted: #ebebea;
+  --fg: #1b1b18;
+  --fg-secondary: #6a6a64;
+  --fg-muted: #959590;
+  --border: #e5e5e0;
+  --border-subtle: #ededea;
+
+  /* default theme: 'default-wvy' (yellow-green) */
+  --primary: #f8ff99;
+  --primary-hover: #f0f76e;
+  --primary-light: #fcffcc;
+  --primary-lighter: #fdffd9;
+  --primary-faint: #feffe8;
+  --primary-dark: #c8cc5c;
+  --primary-fg: #000000;
+  --primary-readable: var(--primary-on-light, var(--fg-secondary));
+  /* Stage colors as text/icons on page bg → use neutral foreground, not gradient colors */
+  --stage-0-readable: var(--fg-secondary);
+  --stage-1-readable: var(--fg-secondary);
+  --stage-2-readable: var(--fg-secondary);
+  --stage-3-readable: var(--fg-secondary);
+  --stage-4-readable: var(--fg-secondary);
+  --stage-5-readable: var(--fg-secondary);
+  --stage-6-readable: var(--fg-secondary);
+  --stage-7-readable: var(--fg-secondary);
+  --stage-8-readable: var(--fg-secondary);
+  --stage-9-readable: var(--fg-secondary);
+  --stage-10-readable: var(--fg-secondary);
+
+  --ring: var(--primary);
+
+  /* Signal palette — traffic-light semantics (OK / warn / danger).
+     Independent of funnel stage colors. Used for status thresholds, alerts,
+     priority badges. */
+  --signal-ok: #52c9a4;
+  --signal-warn: #f4c430;
+  --signal-danger: #e76f51;
+
+  /* shadcn compat */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--bg-card);
+  --muted: var(--bg-muted);
+  --muted-foreground: var(--fg-muted);
+  --accent: var(--bg-subtle);
+  --accent-foreground: var(--fg);
+  --destructive: #D94F4F;
+  --destructive-foreground: #FFFFFF;
+  --secondary: var(--bg-subtle);
+  --secondary-foreground: var(--fg);
+  --primary-foreground: var(--primary-fg);
+  --input: var(--border);
+  --radius: 0.75rem;
+}
+
+/* ── Dark theme ── */
+.dark {
+  --bg: #171716;
+  --bg-card: #232322;
+  --bg-subtle: #2b2b29;
+  --bg-muted: #383836;
+  --fg: #ededea;
+  --fg-secondary: #a5a5a0;
+  --fg-muted: #6a6a66;
+  --border: #383836;
+  --border-subtle: #2b2b29;
+
+  --primary: #f8ff99;
+  --primary-hover: #f0f76e;
+  --primary-light: #fcffcc;
+  --primary-lighter: #fdffd9;
+  --primary-faint: #feffe8;
+  --primary-dark: #c8cc5c;
+  --primary-fg: #000000;
+  --primary-readable: var(--primary-on-dark, var(--fg-secondary));
+  --stage-0-readable: var(--fg-secondary);
+  --stage-1-readable: var(--fg-secondary);
+  --stage-2-readable: var(--fg-secondary);
+  --stage-3-readable: var(--fg-secondary);
+  --stage-4-readable: var(--fg-secondary);
+  --stage-5-readable: var(--fg-secondary);
+  --stage-6-readable: var(--fg-secondary);
+  --stage-7-readable: var(--fg-secondary);
+  --stage-8-readable: var(--fg-secondary);
+  --stage-9-readable: var(--fg-secondary);
+  --stage-10-readable: var(--fg-secondary);
+
+  /* Signal palette — slightly desaturated for dark bg. */
+  --signal-ok: #4ab896;
+  --signal-warn: #e6b528;
+  --signal-danger: #d76048;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-fg);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
+}
+
+* { border-color: var(--border); }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist), system-ui, sans-serif;
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.875rem;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeInUp 0.3s ease-out both; }
+.animate-fade-in-delay-1 { animation: fadeInUp 0.3s ease-out 0.05s both; }
+.animate-fade-in-delay-2 { animation: fadeInUp 0.3s ease-out 0.1s both; }
+.animate-fade-in-delay-3 { animation: fadeInUp 0.3s ease-out 0.15s both; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 1s linear infinite; }
+
+@keyframes countUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.animate-count { animation: countUp 0.25s ease-out both; }
+
+@keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.animate-bar { transform-origin: left center; animation: barGrow 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 40s linear infinite; }
+
+.hover-lift { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.hover-lift:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+.dark .hover-lift:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+
+/* Scrollbar styling — blend with background */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Cross-platform form control normalization ──
+   macOS/Safari render native <select> and <input type="date"> with OS chrome
+   (pill shape, double chevrons, system focus ring) that ignores most CSS.
+   Reset appearance globally and paint our own chevron so every browser matches.
+   Individual components can opt out with `[appearance:auto]`. */
+/* Base reset — tag specificity (0,0,1), overridable by any class */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23959590' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 12px 12px;
+}
+/* Default chevron padding — specificity (0,1,1) beats a single Tailwind class.
+   Opt out with !pr-* / !px-* (Tailwind important) for tiny embedded selects. */
+select[class] { padding-right: 1.75rem; }
+select::-ms-expand { display: none; }
+
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+/* Safari: hide the native picker indicator so our own border/padding controls the look */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+}
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+/* ── Landing Page Animations ── */
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in { animation: scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-left { animation: slideInLeft 0.5s ease-out both; }
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-right { animation: slideInRight 0.5s ease-out both; }
+
+/* Per-card floating animations (unique amplitudes) */
+@keyframes cardFloat0 { 0%,100% { transform: translate(0,0) rotate(-0.5deg); } 25% { transform: translate(6px,-18px) rotate(0.8deg); } 50% { transform: translate(-3px,-8px) rotate(-0.3deg); } 75% { transform: translate(4px,-22px) rotate(0.5deg); } }
+@keyframes cardFloat1 { 0%,100% { transform: translate(0,0) rotate(0.4deg); } 25% { transform: translate(-8px,-14px) rotate(-0.7deg); } 50% { transform: translate(5px,-24px) rotate(0.6deg); } 75% { transform: translate(-5px,-10px) rotate(-0.3deg); } }
+@keyframes cardFloat2 { 0%,100% { transform: translate(0,0) rotate(-0.3deg); } 25% { transform: translate(5px,-20px) rotate(0.9deg); } 50% { transform: translate(-7px,-12px) rotate(-0.5deg); } 75% { transform: translate(3px,-26px) rotate(0.4deg); } }
+@keyframes cardFloat3 { 0%,100% { transform: translate(0,0) rotate(0.6deg); } 25% { transform: translate(-9px,-16px) rotate(-0.8deg); } 50% { transform: translate(6px,-28px) rotate(0.3deg); } 75% { transform: translate(-4px,-14px) rotate(-0.6deg); } }
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes landingMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Agata Chat Animations ── */
+
+@keyframes gradientCycleX {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes gradientCycleY {
+  0% { background-position: 50% 0%; }
+  100% { background-position: 50% 200%; }
+}
+
+@keyframes radialSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes radialPulse {
+  0%   { background-size: 100% 100%; }
+  50%  { background-size: 250% 250%; }
+  100% { background-size: 100% 100%; }
+}
+
+@keyframes focalOrbit {
+  0%   { background-position: 50% 15%; }
+  12.5%  { background-position: 75% 25%; }
+  25%  { background-position: 85% 50%; }
+  37.5%  { background-position: 75% 75%; }
+  50%  { background-position: 50% 85%; }
+  62.5%  { background-position: 25% 75%; }
+  75%  { background-position: 15% 50%; }
+  87.5%  { background-position: 25% 25%; }
+  100% { background-position: 50% 15%; }
+}
+
+@keyframes slideFromLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideFromRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Hide scrollbar but keep scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Disable textarea resize on mobile */
+@media (max-width: 767px) {
+  textarea { resize: none !important; }
+}
+
+/* ── Report Page ── */
+.report-section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 2px solid var(--primary);
+}
+
+/* ── Print Styles ── */
+@page {
+  size: A4 landscape;
+  margin: 10mm 12mm;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  aside, nav, header, footer {
+    display: none !important;
+  }
+
+  .card {
+    background: white !important;
+    border: 1px solid #E5E1DB !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .report-page-break {
+    break-before: page;
+  }
+
+  svg, canvas {
+    break-inside: avoid;
+  }
+
+  .report-header {
+    border-bottom-color: var(--primary) !important;
+  }
+
+  .report-section-title {
+    color: black !important;
+    border-bottom-color: var(--primary) !important;
+    break-after: avoid;
+  }
+
+  .grid {
+    break-inside: avoid;
+  }
+
+  .report-page {
+    display: block !important;
+    width: 100% !important;
+  }
+}
+
+/* Suppress browser focus outline on Recharts SVG + reference areas */
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-surface {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+.recharts-reference-area rect {
+  stroke: none !important;
+  rx: 0 !important;
+  ry: 0 !important;
+}

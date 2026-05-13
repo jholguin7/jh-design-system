@@ -1,0 +1,646 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "jh",
+  "homepage": "https://github.com/jholguin7/jh-design-system",
+  "items": [
+    {
+      "name": "tokens",
+      "type": "registry:style",
+      "title": "Foundation tokens",
+      "description": "CSS variable tokens (light/dark + signals + stages + Tailwind 4 @theme bridge)",
+      "files": [
+        { "path": "registry/tokens/globals.css", "type": "registry:style", "target": "app/globals.css" }
+      ]
+    },
+    {
+      "name": "themes",
+      "type": "registry:lib",
+      "title": "Theme registry",
+      "description": "Theme presets (default-wvy + accent-orange) with light/dark overrides",
+      "files": [
+        { "path": "registry/tokens/themes.ts", "type": "registry:lib", "target": "lib/tokens/themes.ts" }
+      ]
+    },
+    {
+      "name": "cn",
+      "type": "registry:lib",
+      "title": "cn helper",
+      "description": "clsx + tailwind-merge wrapper",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        { "path": "registry/lib/cn.ts", "type": "registry:lib", "target": "lib/cn.ts" }
+      ]
+    },
+    {
+      "name": "i18n",
+      "type": "registry:lib",
+      "title": "i18n base dictionary",
+      "description": "Base translation dictionary + Lang type + mergeDicts helper",
+      "files": [
+        { "path": "registry/lib/i18n.ts", "type": "registry:lib", "target": "lib/i18n.ts" }
+      ]
+    },
+    {
+      "name": "gradients",
+      "type": "registry:lib",
+      "title": "Gradient utilities",
+      "description": "Generate single-color gradients + HSL conversions",
+      "files": [
+        { "path": "registry/lib/gradients.ts", "type": "registry:lib", "target": "lib/gradients.ts" }
+      ]
+    },
+    {
+      "name": "pdf-report",
+      "type": "registry:lib",
+      "title": "PDF report generator",
+      "description": "Generic generatePdf(data, opts) using jspdf",
+      "dependencies": ["jspdf"],
+      "files": [
+        { "path": "registry/lib/pdf-report.ts", "type": "registry:lib", "target": "lib/pdf-report.ts" }
+      ]
+    },
+    {
+      "name": "use-lang",
+      "type": "registry:hook",
+      "title": "useLang hook + I18nProvider",
+      "description": "i18n hook + I18nProvider that wires localStorage persistence",
+      "registryDependencies": ["i18n"],
+      "files": [
+        { "path": "registry/hooks/use-lang.tsx", "type": "registry:hook", "target": "hooks/use-lang.tsx" }
+      ]
+    },
+    {
+      "name": "use-toast",
+      "type": "registry:hook",
+      "title": "useToast hook",
+      "description": "Toast state machine + dispatch",
+      "registryDependencies": ["toast"],
+      "files": [
+        { "path": "registry/hooks/use-toast.ts", "type": "registry:hook", "target": "hooks/use-toast.ts" }
+      ]
+    },
+    {
+      "name": "use-media-query",
+      "type": "registry:hook",
+      "title": "useMediaQuery hook",
+      "description": "Reactively read a CSS media query",
+      "files": [
+        { "path": "registry/hooks/use-media-query.ts", "type": "registry:hook", "target": "hooks/use-media-query.ts" }
+      ]
+    },
+    {
+      "name": "use-outside-click",
+      "type": "registry:hook",
+      "title": "useOutsideClick hook",
+      "description": "Detect clicks outside a ref",
+      "files": [
+        { "path": "registry/hooks/use-outside-click.ts", "type": "registry:hook", "target": "hooks/use-outside-click.ts" }
+      ]
+    },
+    {
+      "name": "use-sort",
+      "type": "registry:hook",
+      "title": "useSort hook",
+      "description": "Controlled sort state for tables",
+      "files": [
+        { "path": "registry/hooks/use-sort.ts", "type": "registry:hook", "target": "hooks/use-sort.ts" }
+      ]
+    },
+    {
+      "name": "use-filters",
+      "type": "registry:hook",
+      "title": "useFilters hook",
+      "description": "Controlled filter state",
+      "files": [
+        { "path": "registry/hooks/use-filters.ts", "type": "registry:hook", "target": "hooks/use-filters.ts" }
+      ]
+    },
+    {
+      "name": "use-preferences",
+      "type": "registry:hook",
+      "title": "usePreferences hook + adapter",
+      "description": "Theme/lang/density/sidebar prefs with pluggable adapter (localStorage default)",
+      "files": [
+        { "path": "registry/hooks/use-preferences.tsx", "type": "registry:hook", "target": "hooks/use-preferences.tsx" }
+      ]
+    },
+    {
+      "name": "theme-provider",
+      "type": "registry:component",
+      "title": "ThemeProvider",
+      "description": "Provider that applies theme CSS vars to <html> + persists to localStorage",
+      "registryDependencies": ["themes"],
+      "files": [
+        { "path": "registry/providers/theme-provider.tsx", "type": "registry:component", "target": "components/providers/theme-provider.tsx" }
+      ]
+    },
+    {
+      "name": "i18n-provider",
+      "type": "registry:component",
+      "title": "I18nProvider re-export",
+      "description": "Re-exports I18nProvider from use-lang (alias convenience)",
+      "registryDependencies": ["use-lang"],
+      "files": [
+        { "path": "registry/providers/i18n-provider.tsx", "type": "registry:component", "target": "components/providers/i18n-provider.tsx" }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "shadcn button primitive",
+      "dependencies": ["@radix-ui/react-slot", "class-variance-authority"],
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/ui/button.tsx", "type": "registry:ui", "target": "components/ui/button.tsx" }
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "Radix-based modal dialog",
+      "dependencies": ["@radix-ui/react-dialog", "lucide-react"],
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/ui/dialog.tsx", "type": "registry:ui", "target": "components/ui/dialog.tsx" }
+      ]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "Radix popover primitive",
+      "dependencies": ["@radix-ui/react-popover"],
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/ui/popover.tsx", "type": "registry:ui", "target": "components/ui/popover.tsx" }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "Styled text input",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/ui/input.tsx", "type": "registry:ui", "target": "components/ui/input.tsx" }
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table primitives",
+      "description": "Styled table parts (Table, TableHeader, …)",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/ui/table.tsx", "type": "registry:ui", "target": "components/ui/table.tsx" }
+      ]
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast primitives",
+      "description": "Radix toast primitives",
+      "dependencies": ["@radix-ui/react-toast", "class-variance-authority", "lucide-react"],
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/ui/toast.tsx", "type": "registry:ui", "target": "components/ui/toast.tsx" }
+      ]
+    },
+    {
+      "name": "toaster",
+      "type": "registry:ui",
+      "title": "Toaster",
+      "description": "Toast viewport wired to useToast",
+      "registryDependencies": ["toast", "use-toast"],
+      "files": [
+        { "path": "registry/ui/toaster.tsx", "type": "registry:ui", "target": "components/ui/toaster.tsx" }
+      ]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "DatePicker",
+      "description": "Locale-aware date picker (es/en) backed by react-day-picker",
+      "dependencies": ["react-day-picker", "lucide-react"],
+      "registryDependencies": ["popover", "use-lang", "use-media-query"],
+      "files": [
+        { "path": "registry/ui/date-picker.tsx", "type": "registry:ui", "target": "components/ui/date-picker.tsx" }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:component",
+      "title": "Sidebar shell",
+      "description": "Parametrizable sidebar with collapse, slots, addon gating",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/layout/sidebar.tsx", "type": "registry:component", "target": "components/layout/sidebar.tsx" }
+      ]
+    },
+    {
+      "name": "header",
+      "type": "registry:component",
+      "title": "Header shell",
+      "description": "Header with title, breadcrumb, right slot",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/layout/header.tsx", "type": "registry:component", "target": "components/layout/header.tsx" }
+      ]
+    },
+    {
+      "name": "mobile-bottom-nav",
+      "type": "registry:component",
+      "title": "MobileBottomNav",
+      "description": "Mobile bottom tab nav (parametrized tabs)",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/layout/mobile-bottom-nav.tsx", "type": "registry:component", "target": "components/layout/mobile-bottom-nav.tsx" }
+      ]
+    },
+    {
+      "name": "mobile-header",
+      "type": "registry:component",
+      "title": "MobileHeader",
+      "description": "Mobile header with hamburger + right slot",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/layout/mobile-header.tsx", "type": "registry:component", "target": "components/layout/mobile-header.tsx" }
+      ]
+    },
+    {
+      "name": "theme-picker",
+      "type": "registry:component",
+      "title": "ThemePicker",
+      "description": "Combobox + light/dark toggle wired to ThemeProvider",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["theme-provider"],
+      "files": [
+        { "path": "registry/molecules/theme-picker.tsx", "type": "registry:component", "target": "components/molecules/theme-picker.tsx" }
+      ]
+    },
+    {
+      "name": "language-toggle",
+      "type": "registry:component",
+      "title": "LanguageToggle",
+      "description": "Toggle between es/en",
+      "registryDependencies": ["use-lang"],
+      "files": [
+        { "path": "registry/molecules/language-toggle.tsx", "type": "registry:component", "target": "components/molecules/language-toggle.tsx" }
+      ]
+    },
+    {
+      "name": "project-switcher",
+      "type": "registry:component",
+      "title": "ProjectSwitcher",
+      "description": "Controlled multi-project selector",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/molecules/project-switcher.tsx", "type": "registry:component", "target": "components/molecules/project-switcher.tsx" }
+      ]
+    },
+    {
+      "name": "ai-loader",
+      "type": "registry:component",
+      "title": "AILoader",
+      "description": "Pulsing dot animation",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/molecules/ai-loader.tsx", "type": "registry:component", "target": "components/molecules/ai-loader.tsx" }
+      ]
+    },
+    {
+      "name": "gradient-picker",
+      "type": "registry:component",
+      "title": "GradientPicker",
+      "description": "Preset gradients + localStorage saved presets",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/molecules/gradient-picker.tsx", "type": "registry:component", "target": "components/molecules/gradient-picker.tsx" }
+      ]
+    },
+    {
+      "name": "filter-bar",
+      "type": "registry:component",
+      "title": "FilterBar",
+      "description": "Generic filter registry (text/select/multi-select)",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/molecules/filter-bar.tsx", "type": "registry:component", "target": "components/molecules/filter-bar.tsx" }
+      ]
+    },
+    {
+      "name": "preferences-page",
+      "type": "registry:component",
+      "title": "PreferencesPage template",
+      "description": "Settings registry pattern page",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/templates/preferences-page.tsx", "type": "registry:component", "target": "components/templates/preferences-page.tsx" }
+      ]
+    },
+    {
+      "name": "admin-users-page",
+      "type": "registry:component",
+      "title": "AdminUsersPage template",
+      "description": "Users table with invite/role/delete actions",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/templates/admin-users-page.tsx", "type": "registry:component", "target": "components/templates/admin-users-page.tsx" }
+      ]
+    },
+    {
+      "name": "admin-projects-page",
+      "type": "registry:component",
+      "title": "AdminProjectsPage template",
+      "description": "Projects grid with create/configure",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/templates/admin-projects-page.tsx", "type": "registry:component", "target": "components/templates/admin-projects-page.tsx" }
+      ]
+    },
+    {
+      "name": "nested-tabs",
+      "type": "registry:component",
+      "title": "NestedTabs template",
+      "description": "Generic tab switcher with localStorage persistence",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/templates/nested-tabs.tsx", "type": "registry:component", "target": "components/templates/nested-tabs.tsx" }
+      ]
+    },
+    {
+      "name": "kpi-card",
+      "type": "registry:component",
+      "title": "KpiCard chart",
+      "description": "Metric + delta + sparkline card",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/charts/kpi-card.tsx", "type": "registry:component", "target": "components/charts/kpi-card.tsx" }
+      ]
+    },
+    {
+      "name": "funnel-chart",
+      "type": "registry:component",
+      "title": "FunnelChart",
+      "description": "Recharts funnel with generic stages prop",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/funnel-chart.tsx", "type": "registry:component", "target": "components/charts/funnel-chart.tsx" }
+      ]
+    },
+    {
+      "name": "funnel-waterfall-chart",
+      "type": "registry:component",
+      "title": "FunnelWaterfallChart",
+      "description": "Funnel as a waterfall (remaining vs lost)",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/funnel-waterfall-chart.tsx", "type": "registry:component", "target": "components/charts/funnel-waterfall-chart.tsx" }
+      ]
+    },
+    {
+      "name": "conversion-steps",
+      "type": "registry:component",
+      "title": "ConversionSteps",
+      "description": "Step-by-step conversion bars + rates",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/charts/conversion-steps.tsx", "type": "registry:component", "target": "components/charts/conversion-steps.tsx" }
+      ]
+    },
+    {
+      "name": "sankey-chart",
+      "type": "registry:component",
+      "title": "SankeyChart",
+      "description": "Recharts sankey diagram",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/sankey-chart.tsx", "type": "registry:component", "target": "components/charts/sankey-chart.tsx" }
+      ]
+    },
+    {
+      "name": "sunburst-chart",
+      "type": "registry:component",
+      "title": "SunburstChart",
+      "description": "Concentric pie sunburst (1-2 rings)",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/sunburst-chart.tsx", "type": "registry:component", "target": "components/charts/sunburst-chart.tsx" }
+      ]
+    },
+    {
+      "name": "treemap-chart",
+      "type": "registry:component",
+      "title": "TreemapChart",
+      "description": "Recharts treemap",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/treemap-chart.tsx", "type": "registry:component", "target": "components/charts/treemap-chart.tsx" }
+      ]
+    },
+    {
+      "name": "timeline-chart",
+      "type": "registry:component",
+      "title": "TimelineChart",
+      "description": "Generic temporal line chart",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/timeline-chart.tsx", "type": "registry:component", "target": "components/charts/timeline-chart.tsx" }
+      ]
+    },
+    {
+      "name": "ad-timeline-gantt",
+      "type": "registry:component",
+      "title": "GanttChart (timeline)",
+      "description": "Generic gantt timeline (bars positioned by start/end)",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/charts/ad-timeline-gantt.tsx", "type": "registry:component", "target": "components/charts/ad-timeline-gantt.tsx" }
+      ]
+    },
+    {
+      "name": "pie-chart",
+      "type": "registry:component",
+      "title": "PieChart",
+      "description": "Generic pie/donut chart",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/pie-chart.tsx", "type": "registry:component", "target": "components/charts/pie-chart.tsx" }
+      ]
+    },
+    {
+      "name": "heatmap-chart",
+      "type": "registry:component",
+      "title": "HeatmapChart",
+      "description": "Token-coloured X×Y heatmap",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/charts/heatmap-chart.tsx", "type": "registry:component", "target": "components/charts/heatmap-chart.tsx" }
+      ]
+    },
+    {
+      "name": "scatter-bubble-chart",
+      "type": "registry:component",
+      "title": "ScatterBubbleChart",
+      "description": "Scatter/bubble (r prop triggers bubble mode)",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/scatter-bubble-chart.tsx", "type": "registry:component", "target": "components/charts/scatter-bubble-chart.tsx" }
+      ]
+    },
+    {
+      "name": "radar-chart",
+      "type": "registry:component",
+      "title": "RadarChart",
+      "description": "Generic radar (multiple series across axes)",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/radar-chart.tsx", "type": "registry:component", "target": "components/charts/radar-chart.tsx" }
+      ]
+    },
+    {
+      "name": "radial-time-chart",
+      "type": "registry:component",
+      "title": "RadialTimeChart",
+      "description": "Hourly/weekday rose chart",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/radial-time-chart.tsx", "type": "registry:component", "target": "components/charts/radial-time-chart.tsx" }
+      ]
+    },
+    {
+      "name": "bump-chart",
+      "type": "registry:component",
+      "title": "BumpChart",
+      "description": "Ranking over time (reversed Y axis)",
+      "dependencies": ["recharts"],
+      "files": [
+        { "path": "registry/charts/bump-chart.tsx", "type": "registry:component", "target": "components/charts/bump-chart.tsx" }
+      ]
+    },
+    {
+      "name": "pivot-explorer",
+      "type": "registry:component",
+      "title": "PivotExplorer",
+      "description": "Generic pivot table (sum/count/avg/max/min)",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/charts/pivot-explorer.tsx", "type": "registry:component", "target": "components/charts/pivot-explorer.tsx" }
+      ]
+    },
+    {
+      "name": "cohort-retention-chart",
+      "type": "registry:component",
+      "title": "CohortRetentionChart",
+      "description": "Retention matrix as opacity-shaded grid",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/charts/cohort-retention-chart.tsx", "type": "registry:component", "target": "components/charts/cohort-retention-chart.tsx" }
+      ]
+    },
+    {
+      "name": "hero",
+      "type": "registry:component",
+      "title": "Hero (landing)",
+      "description": "Landing hero with eyebrow/title/subtitle/CTAs/image",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/hero.tsx", "type": "registry:component", "target": "components/landing/hero.tsx" }
+      ]
+    },
+    {
+      "name": "features",
+      "type": "registry:component",
+      "title": "Features (landing)",
+      "description": "Feature grid",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/features.tsx", "type": "registry:component", "target": "components/landing/features.tsx" }
+      ]
+    },
+    {
+      "name": "testimonials",
+      "type": "registry:component",
+      "title": "Testimonials (landing)",
+      "description": "Quote cards",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/testimonials.tsx", "type": "registry:component", "target": "components/landing/testimonials.tsx" }
+      ]
+    },
+    {
+      "name": "social-proof",
+      "type": "registry:component",
+      "title": "SocialProof (landing)",
+      "description": "Logo row with optional heading",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/social-proof.tsx", "type": "registry:component", "target": "components/landing/social-proof.tsx" }
+      ]
+    },
+    {
+      "name": "cta-section",
+      "type": "registry:component",
+      "title": "CtaSection (landing)",
+      "description": "Centered CTA section",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/cta-section.tsx", "type": "registry:component", "target": "components/landing/cta-section.tsx" }
+      ]
+    },
+    {
+      "name": "footer",
+      "type": "registry:component",
+      "title": "Footer (landing)",
+      "description": "Footer with nav + social + legal",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/footer.tsx", "type": "registry:component", "target": "components/landing/footer.tsx" }
+      ]
+    },
+    {
+      "name": "navbar",
+      "type": "registry:component",
+      "title": "Navbar (landing)",
+      "description": "Sticky landing navbar",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/navbar.tsx", "type": "registry:component", "target": "components/landing/navbar.tsx" }
+      ]
+    },
+    {
+      "name": "scroll-spy",
+      "type": "registry:component",
+      "title": "ScrollSpy (landing)",
+      "description": "In-page section indicator",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/scroll-spy.tsx", "type": "registry:component", "target": "components/landing/scroll-spy.tsx" }
+      ]
+    },
+    {
+      "name": "use-scroll-reveal",
+      "type": "registry:hook",
+      "title": "useScrollReveal hook",
+      "description": "Reveal element when it intersects viewport",
+      "files": [
+        { "path": "registry/landing/use-scroll-reveal.ts", "type": "registry:hook", "target": "hooks/use-scroll-reveal.ts" }
+      ]
+    },
+    {
+      "name": "dot-swarm-background",
+      "type": "registry:component",
+      "title": "DotSwarmBackground (landing)",
+      "description": "Animated dot swarm canvas background",
+      "registryDependencies": ["cn"],
+      "files": [
+        { "path": "registry/landing/dot-swarm-background.tsx", "type": "registry:component", "target": "components/landing/dot-swarm-background.tsx" }
+      ]
+    }
+  ]
+}

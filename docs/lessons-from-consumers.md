@@ -98,6 +98,35 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L7 — `MobileBottomNav` lacked horizontal scroll for >4-5 tabs + label-heavy visual
+
+- **Discovered:** 2026-05-13 (Presupuestos2.0, Plan 4 design exploration vs AIA Website reference)
+- **Status:** `fixed` (commit `02bc204` in jh-design-system)
+- **Severity:** medium (UX cap — couldn't add more nav targets cleanly)
+- **Symptom:** original `MobileBottomNav` used `justify-around` with icon+label per tab. With 5+ tabs it crowded; no scroll fallback; visually heavy.
+- **Reference impl:** AIA Website `src/components/mobile/MobileBottomNav.tsx` uses icon-only, dot indicator under active tab (`absolute -bottom-0.5 w-4 h-0.5`), `max-w-lg mx-auto` container, safe-area-inset-bottom, and supports 7+ items inside the constrained width.
+- **Fix in canonical:** rewrote `registry/layout/mobile-bottom-nav.tsx` to be icon-only by default (`showLabels?: boolean` opt-in), dot indicator pattern, `safe-area-inset-bottom`, and auto-enable `overflow-x-auto` when `tabs.length > 5` (or via explicit `scrollable` prop). Backdrop blur for iOS feel.
+- **Migration for existing consumers:** `<MobileBottomNav tabs={...}>` still works; labels disappear unless `showLabels` is passed. Re-install via `shadcn add --overwrite r/mobile-bottom-nav.json`.
+
+---
+
+### L8 — `Sidebar` visual polish missing user-card pattern + section dividers
+
+- **Discovered:** 2026-05-13 (Presupuestos2.0, Plan 4 design exploration vs AIA Website reference)
+- **Status:** `fixed` (commit `02bc204` in jh-design-system)
+- **Severity:** low (worked, but felt thinner than AIA's polished sidebar)
+- **Symptom:** original `Sidebar` rendered sections without explicit visual dividers between them (only `gap-4`), used `h-4` icons (vs AIA's `h-[18px]`), placed collapse button at the bottom, and had no slot for the "user info card" pattern (avatar + name + inline logout) that production sidebars commonly use.
+- **Reference impl:** AIA Website `src/components/Sidebar.tsx` uses `w-56` / `w-[68px]`, `border-t border-[var(--border-subtle)]` dividers between sections with `pt-3 mt-3`, collapse button at top inline with toggles, and a structured user-card at the bottom (`h-[18px] w-[18px]` avatar tile with initial + name + inline logout button).
+- **Fix in canonical:**
+  1. Adopted AIA dimensions and `h-[18px]` icon sizing.
+  2. Added `border-t` divider between sections (skipped before first).
+  3. Moved collapse button to top of nav area (closer to AIA layout).
+  4. Added `userCardSlot?: React.ReactNode` prop — when provided, replaces the simple-logout fallback at the bottom. Consumers can render their preferred user-info card.
+  5. Items use `truncate` on label span.
+- **Backward compat:** all existing props still work. Consumers without a `userCardSlot` fall back to the simple `onLogout` button (same as before, just styled with `h-[18px]` icon).
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:

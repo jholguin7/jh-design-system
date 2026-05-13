@@ -11,7 +11,7 @@
   "files": [
     {
       "path": "components/providers/i18n-provider.tsx",
-      "content": "\"use client\";\n/**\n * Re-export of I18nProvider from `../hooks/use-lang`.\n * Lets consumers import providers consistently from `registry/providers/*`.\n */\nexport { I18nProvider } from \"../hooks/use-lang\";\n",
+      "content": "\"use client\";\n/**\n * Re-export of I18nProvider from `../hooks/use-lang`.\n * Lets consumers import providers consistently from `registry/providers/*`.\n */\nexport { I18nProvider } from \"@/hooks/use-lang\";\n",
       "type": "registry:component",
       "target": "components/providers/i18n-provider.tsx"
     }

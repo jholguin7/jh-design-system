@@ -146,15 +146,16 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 ### L10 — Recurring relative `../lib/cn` import bug at install (L2 third occurrence)
 
 - **Discovered:** 2026-05-13 (Presupuestos2.0, Plan 4 Phase C, after L2 in Plan 3 Task 11)
-- **Status:** `known` (workaround applied per-consumer; canonical fix still pending)
+- **Status:** `fixed` (canonical commit applied 2026-05-13 to `scripts/build-registry.mjs`)
 - **Severity:** medium (TS error blocks build until fixed; trivial fix but cumulative cost grows)
 - **Symptom:** new registry items (gradient-picker, use-preferences) shipped with `import { cn } from "../lib/cn"` (and `from "../hooks/use-preferences"`, etc.). After shadcn-add lands them at `components/molecules/`, `../lib/cn` resolves to `components/lib/cn` which doesn't exist. Same shape as L2.
 - **Root cause:** canonical registry sources use relative imports because they sit next to siblings inside `registry/`. When shadcn copies them out, the relative paths break (consumer aliases differ). The canonical does this for *all* cross-item imports, not just `cn`. Three offenders in this conversation alone (gradient-picker had 4 such imports).
 - **Catches it:** `tsc --noEmit` post-install — or smoke fail at runtime.
 - **Workaround in consumer:** find/replace `../lib/X` → `@/lib/X` and `../hooks/X` → `@/hooks/X` after every shadcn-add. Three rounds of this and counting.
-- **Proposed fix in canonical:**
-  1. **Build-script rewrite:** in `scripts/build-registry.mjs`, when emitting `r/*.json`, rewrite `../lib/X` and `../hooks/X` etc. to `@/lib/X` / `@/hooks/X` in the `content` field. The registry source files stay as-is (so dev imports work) but the *installed* version uses the alias. Single 5-line code change in the build script.
-  2. **OR:** linter rule that bans relative imports in `registry/**/*` source. Forces authors to use aliases via tsconfig path mappings. Higher friction but catches the bug at write-time.
+- **Fix applied in canonical:**
+  - `scripts/build-registry.mjs` now rewrites `from "../X/Y"` → `from "@/X/Y"` (and the dynamic-import variant `import("../X/Y")`) when emitting `r/*.json`. Affected prefixes: `lib`, `hooks`, `components`, `providers`, `molecules`, `layout`, `templates`, `charts`, `landing`, `ui`, `tokens`. Source files stay relative (so the canonical sandbox + tests resolve siblings correctly); only the installed copies use aliases.
+  - Verified: 0 occurrences of `../lib/` or `../hooks/` remain in any `r/*.json` after rebuild. 65/65 items validate, 64/64 tests pass.
+  - Consumer impact: next `shadcn add` after this commit lands clean files with no L2/L10 fixup needed. Existing installed copies in current consumers still have the relative imports baked in — re-run `shadcn add --overwrite` for affected items (`gradient-picker`, `use-preferences`, `preferences-page`) to pick up the fix.
 
 ---
 

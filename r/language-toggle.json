@@ -11,7 +11,7 @@
   "files": [
     {
       "path": "components/molecules/language-toggle.tsx",
-      "content": "\"use client\";\nimport { useLang } from \"../hooks/use-lang\";\n\nexport function LanguageToggle() {\n  const { lang, setLang, t } = useLang();\n  return (\n    <button\n      type=\"button\"\n      aria-label={t(\"lang.toggle\")}\n      onClick={() => setLang(lang === \"es\" ? \"en\" : \"es\")}\n      className=\"rounded-md border px-2 py-1 text-xs font-medium uppercase hover:bg-[var(--bg-subtle)]\"\n    >\n      {lang}\n    </button>\n  );\n}\n",
+      "content": "\"use client\";\nimport { useLang } from \"@/hooks/use-lang\";\n\nexport function LanguageToggle() {\n  const { lang, setLang, t } = useLang();\n  return (\n    <button\n      type=\"button\"\n      aria-label={t(\"lang.toggle\")}\n      onClick={() => setLang(lang === \"es\" ? \"en\" : \"es\")}\n      className=\"rounded-md border px-2 py-1 text-xs font-medium uppercase hover:bg-[var(--bg-subtle)]\"\n    >\n      {lang}\n    </button>\n  );\n}\n",
       "type": "registry:component",
       "target": "components/molecules/language-toggle.tsx"
     }

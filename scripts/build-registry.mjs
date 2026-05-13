@@ -24,7 +24,17 @@ for (const item of REG.items) {
       (n) => `${REPO_RAW}/${n}.json`,
     ),
     files: item.files.map((f) => {
-      const content = fs.readFileSync(f.path, "utf8");
+      const raw = fs.readFileSync(f.path, "utf8");
+      // L10 fix: rewrite relative imports (../lib/X, ../hooks/X, ../components/X)
+      // to @/ aliases for the installed copy. The canonical sources keep relative
+      // imports so the sandbox + tests compile against the in-repo siblings; the
+      // installed copies need aliases because consumer paths don't preserve the
+      // registry/ layout.
+      const content = raw
+        .replace(/from\s+(['"])\.\.\/(lib|hooks|components|providers|molecules|layout|templates|charts|landing|ui|tokens)\//g,
+                 "from $1@/$2/")
+        .replace(/import\s*\(\s*(['"])\.\.\/(lib|hooks|components|providers|molecules|layout|templates|charts|landing|ui|tokens)\//g,
+                 "import($1@/$2/");
       const out = {
         path: f.target ?? f.path,
         content,

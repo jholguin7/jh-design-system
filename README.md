@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# jh-design-system
 
-## Getting Started
+Canonical reusable design system for jh-* apps. Shipped as a shadcn registry.
 
-First, run the development server:
+## Install components in your app
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx shadcn@latest add https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/tokens.json
+npx shadcn@latest add https://raw.githubusercontent.com/jholguin7/jh-design-system/main/r/sidebar.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Catalog
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Tokens & themes** (light/dark, theme picker, signals, stages)
+- **Primitives** — shadcn baseline (button, dialog, popover, input, table, toast, date-picker)
+- **Layout shells** — Sidebar/Header/MobileBottomNav/MobileHeader (parametrized)
+- **Hooks** — i18n, theme, prefs, media-query, sort, filters, toast, outside-click
+- **Charts** — 15 Recharts generics (KPI/Funnel/Sankey/Sunburst/Treemap/Timeline/Pie/Heatmap/Scatter/Radar/RadialTime/Bump/Pivot/Cohort)
+- **Molecules** — ProjectSwitcher, GradientPicker, AILoader, FilterBar, ThemePicker, LanguageToggle
+- **Page templates** — Preferences, Admin/Users, Admin/Projects, NestedTabs pattern
+- **Landing kit** — Hero, Features, Testimonials, Footer, ScrollSpy, etc.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Consumer requirement: alias map
 
-## Learn More
+For installs to land in the correct subdirectories, your consumer project's `components.json` MUST declare the same custom aliases:
 
-To learn more about Next.js, take a look at the following resources:
+```json
+{
+  "aliases": {
+    "components": "@/components",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks",
+    "utils": "@/lib/cn",
+    "layout": "@/components/layout",
+    "templates": "@/components/templates",
+    "charts": "@/components/charts",
+    "molecules": "@/components/molecules",
+    "providers": "@/components/providers",
+    "landing": "@/components/landing"
+  }
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Source: extracted from AIA Website (read-only origin). AIA is never modified by this repo's lifecycle.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT licensed.

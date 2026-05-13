@@ -140,6 +140,7 @@ function generateBgTints(hex: string, mode: Theme): Record<string, string> {
   if (mode === "light") {
     return {
       "--bg": hslToHex(h, 8, 97.5),
+      "--bg-card": hslToHex(h, 5, 99),
       "--bg-subtle": hslToHex(h, 7, 94.5),
       "--bg-muted": hslToHex(h, 6, 91),
       "--fg": hslToHex(h, 9, 11),

@@ -127,6 +127,71 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L9 — Canonical-stub-vs-AIA-richness drift (registry hides incomplete ports)
+
+- **Discovered:** 2026-05-13 (Presupuestos2.0, Plan 4 Phase B)
+- **Status:** `fixed` (Plan 4 commit `2fd0faf` in canonical)
+- **Severity:** structural (silently caps consumer UX; only surfaces when a consumer wants the "full" capability)
+- **Symptom:** Plan 3 installed `use-preferences` + `gradient-picker` from canonical. Both were 78-87 line stubs vs the 367+439 line richer versions used in AIA Website (the canonical's "spiritual parent"). Consumer thought they had the production system; they actually had a skeleton. Discovered only when explicitly asked to clone AIA's UX in Plan 4.
+- **Root cause:** the canonical was bootstrapped from AIA selectively — some items copied verbatim, others sketched as minimal stubs to keep the registry building. No flag in `registry.json` distinguished "full" items from "stub". Lessons doc was reactive (records bugs) not prescriptive (records what's a stub).
+- **Catches it:** no automated check — a code review against AIA source, or a consumer realizing the UI is thinner than expected.
+- **Workaround in consumer:** Plan 4 ported the rich versions back into canonical, then re-installed in Presupuestos. Cost: ~1 full session.
+- **Proposed fix in canonical:**
+  1. Add `"completeness": "full" | "stub" | "skeleton"` to every `registry.json` item. New items default to `"stub"`. Consumers/installers see the status.
+  2. Companion audit: walk every item in canonical vs. its AIA counterpart and tag completeness honestly.
+  3. Surface this in the catalog README / sandbox so consumers see it before installing.
+
+---
+
+### L10 — Recurring relative `../lib/cn` import bug at install (L2 third occurrence)
+
+- **Discovered:** 2026-05-13 (Presupuestos2.0, Plan 4 Phase C, after L2 in Plan 3 Task 11)
+- **Status:** `known` (workaround applied per-consumer; canonical fix still pending)
+- **Severity:** medium (TS error blocks build until fixed; trivial fix but cumulative cost grows)
+- **Symptom:** new registry items (gradient-picker, use-preferences) shipped with `import { cn } from "../lib/cn"` (and `from "../hooks/use-preferences"`, etc.). After shadcn-add lands them at `components/molecules/`, `../lib/cn` resolves to `components/lib/cn` which doesn't exist. Same shape as L2.
+- **Root cause:** canonical registry sources use relative imports because they sit next to siblings inside `registry/`. When shadcn copies them out, the relative paths break (consumer aliases differ). The canonical does this for *all* cross-item imports, not just `cn`. Three offenders in this conversation alone (gradient-picker had 4 such imports).
+- **Catches it:** `tsc --noEmit` post-install — or smoke fail at runtime.
+- **Workaround in consumer:** find/replace `../lib/X` → `@/lib/X` and `../hooks/X` → `@/hooks/X` after every shadcn-add. Three rounds of this and counting.
+- **Proposed fix in canonical:**
+  1. **Build-script rewrite:** in `scripts/build-registry.mjs`, when emitting `r/*.json`, rewrite `../lib/X` and `../hooks/X` etc. to `@/lib/X` / `@/hooks/X` in the `content` field. The registry source files stay as-is (so dev imports work) but the *installed* version uses the alias. Single 5-line code change in the build script.
+  2. **OR:** linter rule that bans relative imports in `registry/**/*` source. Forces authors to use aliases via tsconfig path mappings. Higher friction but catches the bug at write-time.
+
+---
+
+### L11 — Provider migration (`ThemeProvider` → `PreferencesProvider`) is a breaking change in v0.2
+
+- **Discovered:** 2026-05-13 (Presupuestos2.0, Plan 4 Phase C)
+- **Status:** `documented` (handled cleanly in v0.2 bump)
+- **Severity:** medium (breaking but trivial migration; only one wrap-site in most apps)
+- **Symptom:** v0.1 consumers wired `<ThemeProvider defaultThemeId="accent-orange">`. v0.2 ships `<PreferencesProvider>` with gradient-based palette generation. The two systems compete for the same `--primary` and friends. Consumers that bump must swap one for the other; can't run both simultaneously without one's writes clobbering the other's.
+- **Reference migration (Presupuestos):**
+  ```diff
+  - import { ThemeProvider } from "@/components/providers/theme-provider";
+  + import { PreferencesProvider } from "@/hooks/use-preferences";
+  - <ThemeProvider defaultThemeId="accent-orange" defaultMode="light">
+  + <PreferencesProvider>
+      <I18nProvider defaultLang="es">{children}</I18nProvider>
+  - </ThemeProvider>
+  + </PreferencesProvider>
+  ```
+  Plus drop `ThemePicker` from any nav slots (replaced by `GradientPicker` in preferences page).
+- **Compat note:** `ThemeProvider` + `themes.ts` + `theme-picker` stay in canonical (v0.1 consumers don't break). Just marked as legacy in v0.2. Removal targeted for v1.0.
+- **Catches it:** smoke test that asserts `--primary` reflects the chosen gradient after a `setGradient` call.
+
+---
+
+### L12 — Picker components should accept `labels?` prop, not depend on `useLang` hook
+
+- **Discovered:** 2026-05-13 (Presupuestos2.0, Plan 4 Phase B, porting `GradientPicker` from AIA)
+- **Status:** `fixed` (canonical `gradient-picker.tsx` uses `labels` prop pattern)
+- **Severity:** low (registry-hygiene; matters for consumers that don't ship the i18n hook)
+- **Symptom:** AIA's `GradientPicker` called `useLang().t("prefs.preset-gradients")` directly — registry consumers without the `use-lang` + dict installed get a runtime crash on render.
+- **Root cause:** picker bound its strings to a specific i18n contract (AIA's dict keys). Coupled the component to consumer infra.
+- **Fix in canonical:** accept `labels?: GradientPickerLabels` prop with English defaults. Consumers with i18n pass `labels={{ presetGradients: t("..."), ... }}`. Consumers without i18n get readable English out of the box.
+- **Generalizes to:** any registry component with user-facing strings. Pattern: `labels?: SpecificLabels` with full default object spread (`const t = { ...DEFAULT_LABELS, ...labels }`). Apply to `GradientPicker`, future date/time pickers, file uploaders, etc.
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:

@@ -118,10 +118,20 @@
     {
       "name": "use-preferences",
       "type": "registry:hook",
-      "title": "usePreferences hook + adapter",
-      "description": "Theme/lang/density/sidebar prefs with pluggable adapter (localStorage default)",
+      "title": "usePreferences hook + PreferencesProvider",
+      "description": "Gradient/theme/lang/density/sidebar prefs with pluggable adapter (localStorage default). Generates full palette + stage vars + bg tints from gradient and applies them to <html> on mount.",
+      "registryDependencies": ["gradients"],
       "files": [
         { "path": "registry/hooks/use-preferences.tsx", "type": "registry:hook", "target": "hooks/use-preferences.tsx" }
+      ]
+    },
+    {
+      "name": "use-saved-gradients",
+      "type": "registry:hook",
+      "title": "useSavedGradients hook",
+      "description": "localStorage-backed CRUD over user-saved custom gradients (name + colors[])",
+      "files": [
+        { "path": "registry/hooks/use-saved-gradients.ts", "type": "registry:hook", "target": "hooks/use-saved-gradients.ts" }
       ]
     },
     {
@@ -317,8 +327,9 @@
       "name": "gradient-picker",
       "type": "registry:component",
       "title": "GradientPicker",
-      "description": "Preset gradients + localStorage saved presets",
-      "registryDependencies": ["cn"],
+      "description": "Portal popup picker: 22 presets + custom builder (color stops + drag reorder + flip) + saved gradients. Wired to GradientConfig from use-preferences.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["cn", "gradients", "use-preferences", "use-saved-gradients"],
       "files": [
         { "path": "registry/molecules/gradient-picker.tsx", "type": "registry:component", "target": "components/molecules/gradient-picker.tsx" }
       ]

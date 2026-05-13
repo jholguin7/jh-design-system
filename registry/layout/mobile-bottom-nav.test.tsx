@@ -13,7 +13,7 @@ vi.mock("next/link", () => ({
 }));
 
 describe("MobileBottomNav", () => {
-  it("renders all tabs", () => {
+  it("renders all tabs (icon-only by default, labels via aria-label)", () => {
     render(
       <MobileBottomNav
         tabs={[
@@ -22,7 +22,19 @@ describe("MobileBottomNav", () => {
         ]}
       />,
     );
+    expect(screen.getByLabelText("Home")).toBeInTheDocument();
+    expect(screen.getByLabelText("Settings")).toBeInTheDocument();
+  });
+
+  it("renders text labels when showLabels is true", () => {
+    render(
+      <MobileBottomNav
+        showLabels
+        tabs={[
+          { href: "/", label: "Home", icon: Home },
+        ]}
+      />,
+    );
     expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Settings")).toBeInTheDocument();
   });
 });

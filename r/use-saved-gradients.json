@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-saved-gradients",
+  "type": "registry:hook",
+  "title": "useSavedGradients hook",
+  "description": "localStorage-backed CRUD over user-saved custom gradients (name + colors[])",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "hooks/use-saved-gradients.ts",
+      "content": "\"use client\";\n\nimport { useCallback, useEffect, useState } from \"react\";\n\nexport interface SavedGradient {\n  name: string;\n  colors: string[];\n}\n\nconst STORAGE_KEY = \"jh.gradients.saved\";\n\nfunction load(): SavedGradient[] {\n  if (typeof window === \"undefined\") return [];\n  try {\n    const raw = localStorage.getItem(STORAGE_KEY);\n    if (!raw) return [];\n    const parsed = JSON.parse(raw);\n    if (!Array.isArray(parsed)) return [];\n    return parsed.filter(\n      (g): g is SavedGradient =>\n        g != null && typeof g === \"object\" &&\n        typeof (g as { name?: unknown }).name === \"string\" &&\n        Array.isArray((g as { colors?: unknown }).colors),\n    );\n  } catch {\n    return [];\n  }\n}\n\nfunction persist(gradients: SavedGradient[]) {\n  if (typeof window === \"undefined\") return;\n  try {\n    localStorage.setItem(STORAGE_KEY, JSON.stringify(gradients));\n  } catch {\n    /* ignore quota errors */\n  }\n}\n\nexport function useSavedGradients() {\n  const [savedGradients, setSavedGradients] = useState<SavedGradient[]>([]);\n  const [isLoading, setIsLoading] = useState(true);\n\n  useEffect(() => {\n    setSavedGradients(load());\n    setIsLoading(false);\n  }, []);\n\n  const saveGradient = useCallback((name: string, colors: string[]) => {\n    const trimmed = name.trim();\n    if (!trimmed) return;\n    setSavedGradients((prev) => {\n      const filtered = prev.filter(\n        (g) => g.name.toLowerCase() !== trimmed.toLowerCase(),\n      );\n      const next = [...filtered, { name: trimmed, colors }];\n      persist(next);\n      return next;\n    });\n  }, []);\n\n  const deleteGradient = useCallback((name: string) => {\n    setSavedGradients((prev) => {\n      const next = prev.filter((g) => g.name !== name);\n      persist(next);\n      return next;\n    });\n  }, []);\n\n  return { savedGradients, saveGradient, deleteGradient, isLoading };\n}\n",
+      "type": "registry:hook",
+      "target": "hooks/use-saved-gradients.ts"
+    }
+  ]
+}

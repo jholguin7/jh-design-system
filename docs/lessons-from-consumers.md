@@ -193,6 +193,55 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L13 — `button.tsx` uses Tailwind `bg-primary` while the rest of the app styles with `var(--primary)` arbitrary classes
+
+- **Discovered:** 2026-05-14 (Presupuestos2.0, web-fixes branch — FIX 3, replacing ad-hoc edit-mode buttons with canonical `<Button>`)
+- **Status:** `known` (works correctly; it's an authoring-consistency drift, not a runtime bug)
+- **Severity:** low (no visible breakage — but two token-reference conventions coexist in one codebase, which confuses contributors and risks future divergence)
+- **Symptom:** the canonical `components/ui/button.tsx` `buttonVariants` cva uses Tailwind semantic utility classes — `bg-primary text-primary-foreground`, `bg-destructive`, `bg-accent`, `border-input`, `focus-visible:ring-ring`. Meanwhile every hand-written component in the consumer app styles with arbitrary-value classes referencing CSS vars directly: `bg-[var(--primary)] text-[var(--primary-fg)] hover:bg-[var(--primary-hover)]`, `border-[var(--border-subtle)]`, etc. When you swap an ad-hoc button for `<Button>`, the two conventions sit side by side in the same file.
+- **Why it still works:** the consumer's `globals.css` bridges them with a `@theme` block — `--color-primary: var(--primary); --color-primary-foreground: var(--primary-fg);`. Tailwind 4 turns `--color-primary` into the `bg-primary` utility, so `bg-primary` ultimately resolves to the same `--primary` token the arbitrary classes use. Verified visually: the canonical `<Button>` renders with the correct accent color (and picks up the runtime `PreferencesProvider` gradient override from L11, since that rewrites `--primary`).
+- **Root cause:** `button.tsx` was ported from a shadcn baseline that assumes the stock shadcn token names (`primary`, `primary-foreground`, `destructive`, `accent`, `input`, `ring`) are registered as Tailwind theme colors. The JH design system's own token layer is `--primary` / `--primary-fg` / `--primary-hover` / `--border-subtle` / etc. The `@theme` bridge in `globals.css` is what makes shadcn-style components work at all — but it's an undocumented dependency, and it only maps a subset (`primary`, `primary-foreground`). A consumer that installs `<Button>` but whose `globals.css` lacks the `@theme` bridge gets an unstyled button (utilities resolve to nothing) with **no error** — same silent-failure shape as L1.
+- **Catches it:** browser visual smoke only. `tsc` and `build` pass — Tailwind just emits no rule for an unknown utility.
+- **Workaround in consumer:** none needed here — the `@theme` bridge already exists in this app's `globals.css` (lines ~103-104). Left `<Button>` using `bg-primary` as authored; did not rewrite it to arbitrary `var(--primary)` classes (that would fork the canonical component).
+- **Proposed fix in canonical:**
+  1. Pick one convention for the design system and document it. Either (a) commit to shadcn-style theme colors and ship the required `@theme` block as part of the foundation install (so `bg-primary`, `bg-destructive`, `border-input`, `ring-ring` etc. are guaranteed registered), **or** (b) rewrite `button.tsx` (and any other shadcn-derived `ui/*` component) to use the JH `var(--token)` arbitrary-class convention the rest of the system uses.
+  2. If staying with (a): the foundation registry item must write the full `@theme` mapping for *every* shadcn token name `ui/*` components reference (`primary`, `primary-foreground`, `destructive`, `destructive-foreground`, `secondary`, `secondary-foreground`, `accent`, `accent-foreground`, `muted`, `input`, `border`, `ring`, `background`, `foreground`). The current consumer `@theme` only maps `primary` + `primary-foreground` — `<Button variant="destructive">` or `variant="secondary">` would render unstyled.
+  3. Add a lesson-doc / README note: *"`ui/*` components depend on the `@theme` color bridge in `globals.css`. Verify it's present and complete after foundation install."* — same class of silent-failure as L1/L4.
+
+---
+
+### L14 — no `dropdown-menu` primitive; kebab/action menu hand-rolled on `popover`
+
+- **Discovered:** 2026-06-03 (Presupuestos2.0, rubros edit/archive redesign Fase 1 — per-row 3-dot kebab menu)
+- **Status:** `known` (works; registry gap)
+- **Severity:** low-medium (every consumer that wants an action/kebab menu reinvents it; loses menu a11y)
+- **Symptom:** needed a per-row 3-dot kebab action menu (Archivar / Revertir a CAMICON / Duplicar como plantilla). The registry ships `popover.tsx` and `dialog.tsx` but **no `dropdown-menu`** — and `@radix-ui/react-dropdown-menu` is not a dependency. Had to hand-roll the menu as a `<Popover>` whose content is a stack of plain `<button>` items, with manual styling, manual `setMenuOpen(false)` on each action, and `stopPropagation` on the trigger so the click doesn't toggle the row's expand.
+- **Root cause:** registry lacks the shadcn `dropdown-menu` primitive. `Popover` is a generic floating container, not a menu — it gives no `role="menu"`/`menuitem`, no roving-tabindex/arrow-key navigation, no typeahead, and no auto-close-on-select. A kebab menu wants all of those.
+- **What catches it:** authoring only — no `tsc`/build error. The Popover-as-menu works visually and functionally for a short list; it just lacks keyboard-menu semantics.
+- **Workaround in consumer:** `Popover` + `<button>` rows (`components/catalogo/RowKebab.tsx`); `Dialog` for the Duplicar name prompt. Trigger does `e.stopPropagation()` to avoid the row's expand toggle. Menu items call the action then `setMenuOpen(false)`. Good enough for 1–3 items; would not scale to a rich menu (submenus, checkboxes, shortcuts).
+- **Proposed fix in canonical:**
+  1. Add `dropdown-menu.tsx` (shadcn baseline on `@radix-ui/react-dropdown-menu`) to the registry as the standard for action/kebab menus, plus the dep.
+  2. Document the split: **Popover = freeform content** (forms, pickers, info), **DropdownMenu = action lists** (kebab, row actions, context menus).
+  3. Same `@theme` token dependency as L13 applies (menu content/item classes must resolve `bg-popover`/`accent`/etc. or use the JH `var(--token)` convention).
+
+---
+
+### L15 — unlayered `* { border-color: var(--border) }` silently defeats every Tailwind border-color utility
+
+- **Discovered:** 2026-07-22 (Presupuestos2.0, ronda de polish pre-demo)
+- **Status:** `open`
+- **Severity:** high (silent visual drift app-wide; invisible to tsc/tests/build)
+- **Symptom:** every `border-*` color utility in the app (`border-transparent`, `border-[var(--fg)]`, `focus:border-[var(--primary)]`, `border-[var(--border-subtle)]`) computed `var(--border)` (#eaeaea) instead of its declared color. Black hairlines on grand totals rendered light gray; orange focus/status borders rendered gray; borderless-hover inputs (`border-transparent hover:border-[var(--border)]`) showed permanent boxes. Nobody noticed for months because most declared colors were grays close to #eaeaea.
+- **Root cause:** `app/globals.css` carried `* { border-color: var(--border); }` OUTSIDE any `@layer` (the Tailwind-v3-default restoration rule). In Tailwind v4, utilities live in `@layer utilities`, and **unlayered author CSS beats ALL layered CSS regardless of specificity** — even a `*` selector with specificity (0,0,0) wins over every utility class.
+- **Catches it:** only a computed-style probe in the browser (`getComputedStyle(el).borderColor` vs the class string). tsc, vitest, and `next build` all pass.
+- **Workaround in consumer:** wrap the rule in `@layer base { * { border-color: var(--border); } }` (Presupuestos commit `7e0f662`). Utilities win again; elements with no color utility keep the default.
+- **Proposed fix in canonical:**
+  1. If any registry `globals.css` ships a border-color default (v3 compat), it MUST be inside `@layer base`.
+  2. Add to consumer docs: in Tailwind v4, any global rule in `globals.css` that touches properties utilities also set (border-color, outline, etc.) must live in `@layer base` — unlayered rules beat utilities.
+  3. Optional probe in the visual smoke: assert a `border-transparent` element computes transparent.
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:

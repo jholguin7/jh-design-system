@@ -242,6 +242,25 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L16 — `--accent` is a shadcn alias for a *background*, so a real accent color has nowhere to live
+
+- **Discovered:** 2026-07-24 (Presupuestos2.0, pins UI 83/81/85)
+- **Status:** `documented` — consumer worked around it; canonical fix proposed below
+- **Severity:** medium (naming trap; every consumer that eventually wants an accent hits it)
+- **Symptom:** the consumer needed to introduce exactly one accent color into an otherwise strict 2-color (bg + fg) system. The obvious token name, `--accent`, was already taken: in the shadcn compat block it aliases `--bg-subtle` (a near-white hover background), and `--accent-foreground` aliases `--fg`. Any developer who reaches for "the accent color" gets a hover gray. The consumer's own design doc had to carry a **PROHIBIDO `--accent`** rule, which is a documented footgun rather than a fix — and it stayed a footgun long enough to be re-discovered here.
+- **Root cause:** shadcn's `accent`/`accent-foreground` pair means "subtle emphasis surface", not "brand accent". Inheriting that vocabulary into a token system whose users read `accent` with the everyday meaning guarantees the collision. The name is load-bearing in the wrong direction.
+- **Workaround used in the consumer:** new token named `--accent-signal` (+ derived `--accent-signal-fg`, black or white by luminance so text inside the accent stays legible at 9px). Deliberately NOT `--accent`. Documented side by side with the prohibition so the two can't be confused.
+- **Two design decisions worth stealing, independent of the naming:**
+  1. **A third color needs a closed whitelist, not an exception.** The consumer's design law said "JAMÁS un tercer color". Rather than quietly breaking it, the rule was amended to name the token, give it exactly ONE meaning ("there is something new addressed to you"), and enumerate the *only two* places it may appear — everything else explicitly prohibited. An open-ended "use sparingly" would have leaked within a sprint.
+  2. **The accent must not participate in theme inversion.** The consumer's dark mode is a pure swap of the bg/fg pair (`effectivePair`). An accent that rides inside that pair would invert into a different hue. Keeping it a sibling of the pair, applied to `:root` separately, is what makes it stable across themes. There is now a regression test asserting the swap function still returns exactly two keys.
+- **Catches it:** nothing automatic — it's a naming collision, so it type-checks and renders fine while looking wrong. Only a human reading `bg-[var(--accent)]` and expecting color catches it.
+- **Proposed fix in canonical:**
+  - Rename the shadcn compat aliases to `--surface-emphasis` / `--surface-emphasis-fg`, keeping `--accent` as a deprecated alias for one minor version so existing consumers don't break.
+  - Ship `--accent-signal` + `--accent-signal-fg` (with the luminance-derived foreground helper) as first-class optional tokens, documented as "opt-in, whitelist-governed, never inverted".
+  - Add the whitelist-amendment pattern to the design-doc template: a third color is admissible only with a stated single meaning and an enumerated list of permitted uses.
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:

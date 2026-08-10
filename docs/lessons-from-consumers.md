@@ -261,6 +261,47 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L17 — `MobileBottomNav` icon-only: el activo no se ve, la mitad de la app no entra, y `fixed` tapa contenido
+
+- **Discovered:** 2026-08-10 (Presupuestos2.0, polish de UI mobile)
+- **Status:** `open` — el consumidor retiró el componente de su shell
+- **Severity:** medium (el primitivo funciona, pero sus defaults empujan a una nav que no se puede leer ni completar)
+- **Symptom:** el bottom-nav del registry se montó tal cual (`showLabels` en su default `false`) y en producción resultó ilegible y parcial: cinco glifos sin texto, y el indicador de activo — un `<span>` de `w-4 h-0.5` en `absolute -bottom-0.5` — quedaba fuera del área visible del tab, así que **ninguna** pestaña se veía activa. Además el componente admite como mucho ~5 tabs antes de scrollear, y la app tenía **nueve** destinos: cuatro (Catálogo, Cronograma, Control, Inbox) quedaron sin ninguna entrada en mobile, alcanzables sólo escribiendo la URL. Y siendo `fixed bottom-0`, tapaba la última fila de toda tabla larga salvo que cada página recordara su propio padding inferior.
+- **Root cause:** tres defaults, no bugs. (1) `showLabels = false` convierte al componente en un jeroglífico salvo que los iconos sean universales (home, buscar, perfil) — no lo son en una app de dominio (presupuesto vs. cronograma vs. catálogo). (2) El indicador de activo se posiciona **fuera** del padding del link (`-bottom-0.5`), así que depende de que el contenedor no recorte; en un contenedor con `overflow-x-auto` (que el propio componente activa con >5 tabs) se pierde. (3) `fixed` traslada al consumidor la responsabilidad de compensar el alto, y basta una página que lo olvide para perder contenido.
+- **What catches it:** nada automático. Renderiza, typechequea y los tests de "hay cinco links" pasan. Sólo una captura a 375px lo muestra.
+- **Workaround in consumer:** se reemplazó por un **HUD de modo** propio (`components/layout/mobile-mode-nav.tsx`): una fila con UN botón que **imprime el nombre de la pantalla actual** + una hoja que lista todos los destinos, derivada del MISMO array `sections` que consume el `Sidebar` desktop (nada puede quedar inalcanzable) y **no `fixed`** — hermano `shrink-0` de `<main>`, ocupa alto real. `MobileBottomNav` queda en el repo sin consumidor.
+- **Proposed fix in canonical:**
+  1. Invertir el default: `showLabels = true`. Un bottom-nav sin labels debería ser el opt-in explícito, no el camino por defecto.
+  2. Mover el indicador de activo **dentro** del padding del link (`bottom-0` con `pb`), o cambiarlo por peso tipográfico, que no depende de geometría ni de overflow.
+  3. Ofrecer `sticky`/in-flow como alternativa a `fixed`, o al menos exportar la altura como custom property (`--mobile-nav-h`) para que el consumidor la descuente sin adivinar.
+  4. **Documentar el techo de destinos.** El componente degrada a scroll horizontal por encima de 5 tabs; conviene decir explícitamente que por encima de ~5 el patrón correcto es otro (selector de modo + hoja), no una barra más larga.
+
+---
+
+### L18 — Tailwind v4: cuando la escala tipográfica está hardcodeada en `text-[Npx]`, el único "token" real es un mapa sin capa
+
+- **Discovered:** 2026-08-10 (Presupuestos2.0, bajar ~2pt la tipografía en mobile)
+- **Status:** `documented` — patrón que funcionó, vale recomendarlo
+- **Severity:** low (no es un bug: es una técnica que evita una refactorización de ~800 ediciones)
+- **Symptom:** el pedido era "bajá 2pt la escala base en mobile, en el token". No había token: la app aplica su escala escribiendo `text-[Npx]` en cada componente — **818 usos, nueve tamaños distintos**. Ni `html { font-size }` ni un token de `@theme` mueven un `font-size` en px absolutos, así que la lectura literal del pedido llevaba a tocar cientos de archivos y a sembrar `text-[11px] md:text-[13px]` por todos lados.
+- **Root cause:** un design system cuya escala vive en utilities arbitrarias no tiene punto de control. El punto de control **existe igual**, pero es el conjunto de los N tamaños en uso, no una variable.
+- **Solución (recomendable):** un bloque único al final de `globals.css` que reasigne esos N tamaños dentro de un media query:
+  ```css
+  @media (max-width: 767px) {
+    .text-\[13px\] { font-size: 11px; }
+    .text-\[12px\] { font-size: 10px; }
+    /* … los N tamaños en uso, con un PISO explícito */
+  }
+  ```
+  **Va sin `@layer`, a propósito** — es el reverso exacto de L15: en Tailwind v4 las utilities viven en `@layer utilities` y una regla sin capa le gana a cualquier regla en capa sin importar especificidad. Acá esa asimetría es la herramienta, no la trampa: pisa `text-[13px]` sin un solo `!important` y sin depender del orden del bundle. Dos consecuencias a tener presentes: hay que fijar un **piso** (por debajo de ~9px los micro-labels uppercase dejan de leerse) y con muchos escalones **algunos colapsan** — hay que elegir cuáles a conciencia, no por redondeo.
+- **What catches it:** que la regla gane se verifica con una sonda de estilo computado (`getComputedStyle(el).fontSize`) en el navegador; el inventario de tamaños sale de un `grep -ohE 'text-\[[0-9]+px\]' | sort | uniq -c`. Nada de esto lo ve `tsc` ni el build.
+- **Proposed fix in canonical:**
+  1. Shipear una escala tipográfica **en tokens** (`--text-xs … --text-xl` + utilities semánticas) para que los consumidores nuevos no caigan en `text-[Npx]`; documentar `text-[Npx]` como escape hatch, no como camino principal.
+  2. Documentar esta técnica del mapa sin capa como la salida estándar para consumidores que ya tienen la escala hardcodeada — es la migración barata, y deja el inventario a la vista para migrar a tokens después.
+  3. Emparejarla con L15 en los docs: **la misma regla de cascada** (unlayered > layered) es un bug en un caso y la herramienta en el otro. Enseñarlas juntas.
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:

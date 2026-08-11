@@ -356,6 +356,23 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L22 — "cero scroll lateral" es una regla de accesibilidad mal generalizada: se come las tablas
+
+- **Discovered:** 2026-08-10 (Presupuestos2.0, pines #153 y #156 — el usuario revirtió a mano un fix del día anterior)
+- **Status:** `documented`
+- **Severity:** high (la "corrección" destruye la superficie principal del producto y se siente como una mejora al hacerla)
+- **Symptom:** una tanda de fixes de mobile eliminó todo el scroll lateral de la app persiguiendo `scrollWidth === clientWidth`. Efecto colateral: la tabla de presupuesto pasó a apilar cada partida en tres renglones y el ledger de gastos escondió nueve columnas bajo `md`. El usuario lo rechazó al día siguiente en una frase: *"prefiero que cada fila sea una sola fila en pantalla, y si tengo que hacer scroll lateral lo hago"*.
+- **Root cause:** la heurística "no debe haber scroll horizontal" (WCAG 1.4.10 Reflow) está escrita para **texto corrido y controles**, y el design system la publica —cuando la publica— sin decir a qué se aplica. Aplicada a una **tabla de datos** invierte su resultado: la alineación vertical entre filas *es* el contenido de una tabla, así que apilar la fila para que "entre" destruye justamente lo que se quería preservar. El estándar mismo exempta el contenido que requiere layout bidimensional; el sistema no transporta esa excepción, y el agente/desarrollador siguiente sólo ve la regla.
+- **What catches it:** nada automático, en ninguna de las dos direcciones. jsdom no hace layout (`clientWidth` = 0 siempre), así que ni el desborde ni el apilado son observables en tests; la sonda de navegador que mide el desborde **premia** el apilado, porque el número baja a cero. Es un caso donde la métrica automatizable empuja hacia el diseño equivocado.
+- **Workaround en el consumidor** (`DESIGN.md §5.0`): se escribió el criterio con nombre — **"superficie de documento"** — y una prueba de tres condiciones (fila = registro; se lee comparando la misma columna entre filas; el ancho lo fija el dato, no la pantalla). Lo que pasa la prueba scrollea de lado **dentro de su propio contenedor** (`overflow-x-auto` + `min-w-0`, con desvanecido de borde para que sea descubrible, y freeze opcional de la primera columna con la preferencia persistida). Lo que no la pasa —nav, headers, filtros, formularios, tarjetas de dashboard— sigue bajo cero-overflow. El invariante se reformuló: no es "nada scrollea de lado", es **"la PÁGINA no scrollea de lado"**.
+- **Proposed fix in canonical:**
+  1. Publicar el criterio, no sólo la regla: cualquier guía de responsive del sistema debe traer la **excepción de tabla de datos** al lado de la regla de reflow, o el próximo consumidor la vuelve a generalizar.
+  2. Un primitivo `DataSurface` (scroller con `min-w-0` obligatorio + señal de borde + slot de freeze de primera columna). Los tres se implementaron por separado en este consumidor y los tres tienen la misma trampa de `min-width: auto`.
+  3. Regla escrita sobre la señal: un contenedor que scrollea **sin marca de borde** no se lee como scrolleable, se lee como contenido cortado. El desvanecido de 24px que sólo aparece cuando hay algo escondido es la forma que no agrega cromo permanente.
+  4. Y una nota de proceso: cuando un fix de layout **borra** una capacidad (scroll, una columna, un gesto) en vez de reubicarla, eso merece confirmación explícita antes de entregarse. L19 midió bien el problema y eligió mal el remedio para tres de las cinco pantallas.
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:

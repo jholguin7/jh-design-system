@@ -321,6 +321,41 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L20 — un control icon-only necesita TRES contratos, y el design system no da ninguno
+
+- **Discovered:** 2026-08-10 (Presupuestos2.0, fila de filtros del Catálogo comprimida a una sola fila de iconos en mobile)
+- **Status:** `documented`
+- **Severity:** high (todo consumidor termina escondiendo texto en mobile; es la salida obvia y la que más se rompe en silencio)
+- **Symptom:** para meter seis controles en 343px se esconde el texto (`hidden md:inline`) y quedan glifos. Los tres defectos aparecen a la vez y ninguno lo canta el toolchain: (1) los botones se quedan **sin nombre accesible**, porque el nombre venía del texto; (2) el estado "activo / con valor puesto", que se marcaba con `font-bold`, **desaparece** — un glifo no engorda, así que un filtro encendido se ve idéntico a uno apagado y el usuario no entiende por qué faltan filas; (3) la **acción primaria** (`+ Nuevo`) queda visualmente indistinguible de los filtros, porque sin texto todos son "un icono de 14px".
+- **Root cause:** esconder el texto no es un cambio de tamaño, es **quitarle al control su portador de identidad y de estado**. El design system trata `icon` y `label` como dos props independientes de un botón, cuando en realidad el label carga tres funciones (nombre accesible, estado por peso, jerarquía por longitud) que hay que reasignar explícitamente cuando se va.
+- **What catches it:** nada automático. `tsc` y el build no ven CSS; jsdom no aplica media queries, así que un test que busque el botón por texto **sigue pasando en verde** aunque en el teléfono real ese texto no exista. Lo único que lo atrapa es un test que verifique el `aria-label` y las clases `hidden md:inline` como contrato explícito, o un ojo en el navegador.
+- **Workaround en el consumidor** (`DESIGN.md §6.16b`), tres reglas fijas:
+  1. **Nombre**: `aria-label` + `title` con el mismo rótulo, en TODOS los controles de la fila. Ojo: el `title` **no existe en táctil**, así que no es el respaldo del `aria-label` — el `aria-label` es el nombre, el `title` es sólo el tooltip de desktop.
+  2. **Estado**: el glifo pasa de `--fg-muted` a `--fg` **y** se le cuelga una marca —cuadrado sólido de 5px en la esquina superior derecha, `md:hidden`—. El relleno del glifo (`fill-current`) sirve donde el icono lo admite, pero no puede ser el mecanismo: la mitad de los iconos lineales no rellenan nada. Y lo que es **cifra** (un conteo `12`, un `3/8`) se queda visible en las dos anchuras: es dato, no rótulo, y sin él el icono es una caja negra.
+  3. **Jerarquía**: la acción primaria se aparta (`ml-auto md:ml-0`) **y** cambia de forma (sólido invertido, no glifo suelto). Una sola de las dos no alcanza.
+- **Proposed fix in canonical:**
+  1. Que el primitivo de botón/toggle acepte `label` **siempre obligatorio** y una prop `labelHidden?: "sm" | "always"` que se encargue sola de mover el label al `aria-label` + `title`. Hoy cada consumidor escribe `<span className="hidden md:inline">` a mano y se olvida del `aria-label` en la mitad de los casos.
+  2. Añadir al primitivo de toggle una prop `hasValue?: boolean` distinta de `pressed`, con la marca de esquina de fábrica: "encendido" y "tiene valor puesto" se ven igual cuando hay texto y **no** cuando no lo hay.
+  3. Documentar la separación de ejes: si en una misma fila conviven un **selector** (uno de N, sólido invertido) y **toggles** (booleanos acumulables), los dos no pueden compartir marca. Sin esa regla escrita, el segundo consumidor va a poner el sólido en los dos.
+
+---
+
+### L21 — no hay escala de `z-index`, así que los overlays se ordenan por número inventado y el modal pierde
+
+- **Discovered:** 2026-08-10 (Presupuestos2.0, la hoja de navegación mobile quedaba por debajo de los botones flotantes)
+- **Status:** `documented`
+- **Severity:** medium (silencioso: no rompe nada, sólo tapa dos ítems de una lista, y sólo en mobile)
+- **Symptom:** la hoja modal de navegación (`z-[70]`) se abría y los FAB de comentarios/feedback (`z-[80]`, `fixed`) se pintaban **encima**, tapando dos destinos de la lista. Nadie eligió eso: cada overlay nació en un PR distinto y se puso el número que en ese momento le alcanzaba.
+- **Root cause:** el design system publica tokens de color, tipografía y espacio, pero **no una escala de apilamiento**. Sin ella, `z-index` es un número mágico por archivo y el orden real de la app es el resultado accidental del orden en que se escribieron los componentes. Segundo síntoma del mismo vacío: los FAB llevaban `bottom-[76px]` en mobile para despejar una barra de navegación inferior que ya no existe — un offset heredado de un elemento retirado, que nadie recalcula porque no hay nada que lo declare.
+- **What catches it:** nada. No hay test de layer order y jsdom no compone. Se ve mirando la pantalla, y sólo si el modal cae justo donde está el flotante.
+- **Workaround en el consumidor:** subir la hoja modal a `z-[100]`, por encima de FAB (`80`) y de sus popovers (`90`), y dejarlo escrito en `DESIGN.md §6.5b` con el razonamiento ("una hoja modal que se deja pintar encima no es modal"). Y devolver el `bottom` de los FAB al borde ahora que la barra inferior se fue.
+- **Proposed fix in canonical:**
+  1. Publicar una **escala de z nombrada** como tokens (`--z-sticky`, `--z-fab`, `--z-overlay`, `--z-modal`, `--z-toast`) y usarla en todos los primitivos. Un número suelto en un componente pasa a ser un smell revisable.
+  2. Regla escrita: **lo `fixed` cede ante lo modal, siempre**. Un FAB es cromo persistente; un modal es una conversación exclusiva.
+  3. Que los primitivos `fixed` (FAB, toast) tomen su offset de un token de "alto de cromo de borde" en vez de un `bottom-[Npx]` literal: cuando el cromo cambia, el offset se corrige solo en vez de quedar como aire muerto.
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:

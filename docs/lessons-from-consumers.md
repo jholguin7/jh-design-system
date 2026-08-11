@@ -302,6 +302,25 @@ Status taxonomy: `open` (not addressed) · `fixed` (landed in registry) · `know
 
 ---
 
+### L19 — `min-width:auto` es la causa raíz del scroll lateral en mobile, y el culpable nunca es el elemento que se ve cortado
+
+- **Discovered:** 2026-08-10 (Presupuestos2.0, cacería de horizontal overflows a 375px)
+- **Status:** `documented`
+- **Severity:** medium (afecta a todo consumidor que meta una tabla o un `truncate` dentro de un grid/flex, o sea: a todos)
+- **Symptom:** en un teléfono de 375px la app scrolleaba de lado en cuatro pantallas. Lo que se VE es un contador o una etiqueta cortada contra el borde derecho — pero el elemento cortado no tiene nada malo. En Inicio, el culpable real era una tabla de otra sección: los tres bloques del grid medían 360px dentro de un contenedor de 343 porque **uno solo** de ellos tenía min-content 360.
+- **Root cause:** los items de grid y de flex traen `min-width: auto`, o sea que **no bajan de su min-content**. Tres consecuencias que se repiten:
+  1. Un grid de una columna en mobile no mide el contenedor: mide el min-content del item más ancho, y se lo impone a TODOS sus hermanos.
+  2. Un `overflow-x-auto` alrededor de una tabla ancha **no alcanza** si su ancestro es un item de grid: el scroller no puede encogerse, así que el ancho sale igual por arriba y termina siendo scroll de la página.
+  3. `truncate` dentro de un flex **no trunca nunca** sin `min-w-0`: `truncate` incluye `white-space:nowrap`, así que el min-content del span es el texto entero y empuja en vez de recortarse.
+- **What catches it:** nada del toolchain — ni `tsc`, ni el build, ni los tests de jsdom (no hay layout). Sólo una medición en el navegador. La sonda que lo encontró: recorrer los scrollers reales (`documentElement` + todo lo que tenga `overflow-x: auto|scroll` **y** `scrollWidth > clientWidth`), y dentro de cada uno quedarse con los elementos **más profundos** cuyo `right` pasa el límite, descartando los que ya viven dentro de un scroller anidado. Sin el "más profundo" el reporte dice `<body>`, que no sirve para arreglar nada.
+- **Workaround en el consumidor:** `[&>*]:min-w-0` en el contenedor de grid (una sola clase cubre los items presentes y los futuros, que es lo que un contenedor de bloques necesita) y `min-w-0` en todo span con `truncate`. Nunca `overflow-x: hidden` en el ancestro: esconde el síntoma y recorta contenido que el usuario necesita leer. Las salidas legítimas son envolver, truncar con elipsis, reacomodar en dos renglones, o —cuando el contenido es genuinamente ancho, tipo Gantt— dejar que el scroll viva **dentro** de ese componente con el resto de la UI quieto.
+- **Proposed fix in canonical:**
+  1. Que los primitivos de layout que envuelven contenido (cards, secciones de grid, item de nav, celda de tabla) traigan `min-w-0` de fábrica: hoy cada consumidor lo redescubre a los golpes.
+  2. Que el primitivo de tabla que ya viene con `overflow-x-auto` documente que **el wrapper no basta** si el ancestro no puede encoger, y que los pisos tipo `min-w-[480px]` se declaren `md:min-w-[…]` — un piso de legibilidad de escritorio no tiene sentido en un teléfono, y ahí se cobra como scroll.
+  3. Publicar la sonda de overflow como script del repo (`scripts/check-overflows.mjs` + Playwright a 375px): es la única red que atrapa esta clase de bug, y hoy no existe en ningún lado.
+
+---
+
 ## How to add a lesson
 
 Append a new `### Lx — short title` section under "Lessons" with:
